@@ -45,3 +45,6 @@ data/reports/
 data/seed-result.json
 .env*.local
 .env
+/.claude/launch.json
+/data/db.json
+/tsconfig.tsbuildinfo
