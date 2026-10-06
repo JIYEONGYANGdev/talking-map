@@ -1,0 +1,29 @@
+[
+  {
+    "id": "sample-okjeong-a",
+    "name": "옥정A초등학교(임시)",
+    "lat": 37.8215,
+    "lng": 127.094,
+    "address": "경기도 양주시 옥정동 (임시 좌표 — 공공데이터 적재 후 교체)",
+    "district": "옥정",
+    "sample": true
+  },
+  {
+    "id": "sample-hoecheon-a",
+    "name": "회천A초등학교(임시)",
+    "lat": 37.84,
+    "lng": 127.06,
+    "address": "경기도 양주시 덕정동 (임시 좌표 — 공공데이터 적재 후 교체)",
+    "district": "회천",
+    "sample": true
+  },
+  {
+    "id": "sample-old-a",
+    "name": "기존시가지A초등학교(임시)",
+    "lat": 37.785,
+    "lng": 127.045,
+    "address": "경기도 양주시 남방동 (임시 좌표 — 공공데이터 적재 후 교체)",
+    "district": "기존시가지",
+    "sample": true
+  }
+]
