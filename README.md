@@ -19,6 +19,14 @@ Supabase 없이도 돌아간다(`data/db.json` 파일 저장소). Vercel 배포 
 3. CP949 인코딩이면 `iconv -f cp949 -t utf-8 파일 > 파일.utf8.csv`
 4. `npm run load-data` → `data/schools.json`, `data/zones.json` 생성(양주시 초등학교만). 임시 좌표 3개는 이때 교체된다.
 
+## 어린이 사고다발지역 적재 (선택)
+도로교통공단 [어린이보호구역내 어린이 교통사고 다발지역](https://www.data.go.kr/data/15058311/openapi.do) API. 활용신청 후 `.env.local`의 `DATA_GO_KR_KEY`에 일반 인증키(Decoding)를 넣고
+```bash
+npm run load-accidents          # 최근 5개년, 경기도(41) 양주시(630)
+npm run load-accidents 2023     # 연도 지정
+```
+`data/accidents.json`에 저장되고 학교 지도에 붉은 점선 원으로 표시된다. 양주시 결과가 0건이면 학교 페이지에 "아직 사고다발지역 지도에 없습니다 — 신고가 첫 신호입니다"가 뜬다. 그 빈 상태가 이 서비스의 문제정의다.
+
 ## 모의 신고 투입 + 정확도
 `data/mock-reports.json`에 `{ text, address?, label:{category, agencyId, schoolId} }` 로 추가한 뒤
 ```bash
@@ -34,7 +42,10 @@ npm run seed           # 종류/기관/학교 일치율 출력
 | `/report` 신고 폼(문자 게이트웨이 대역) | 학부모 |
 | `/reports/:token` 내 신고 진행 확인 | 학부모 |
 | `/schools/:id/reports/YYYY-MM` 월간 리포트 | 학부모 |
-| `/admin` 학교별 점검표 (비밀번호: `ADMIN_PASSWORD`, 기본 `yangju2026`) | 공무원 |
+| `/admin` 학교별 점검표 (비밀번호: `ADMIN_PASSWORD`, 기본 `yangju2026`; `.env.example`을 복사했다면 `change-me`) · 신호 카드의 작은 지도를 클릭해 좌표 보정 | 공무원 |
 
 ## 구조
-`app/` 화면·API · `lib/ai.ts` Claude 호출 · `prompts/v1.ts` 프롬프트 · `lib/mask.ts` 개인정보 마스킹 · `lib/db.ts` 파일/Supabase 저장소 · `lib/geo.ts` 마커 색 규칙 · `scripts/` 데이터 적재·모의 신고 · `data/agencies.json` 담당 기관 표
+`app/` 화면·API · `lib/ai.ts` Claude 호출 · `prompts/v1.ts` 프롬프트 · `lib/mask.ts` 개인정보 마스킹 · `lib/db.ts` 파일/Supabase 저장소 · `lib/geo.ts` 마커 색 규칙 · `scripts/` 데이터 적재(학교·보호구역·사고다발지역)·모의 신고 · `data/agencies.json` 담당 기관 표
+
+## 실행 환경 주의 (Mac)
+시스템 Node가 14면 Next 16이 돌지 않고 npm 6이 `package-lock.json`을 v1으로 바꿔 버린다. `bash setup-mac.sh`로 nvm + Node 22를 잡고, 터미널마다 `node -v`가 v22인지 확인한다. API 키가 "워크스페이스에 묶이지 않은 키"면 `ANTHROPIC_WORKSPACE_ID`도 넣어야 한다(.env.example 참고).

@@ -42,6 +42,21 @@ export type Zone = {
   police?: string;
 };
 
+/** 어린이보호구역 내 어린이 교통사고 다발지역 (도로교통공단, data.go.kr 15058311) */
+export type Accident = {
+  id: string;
+  name: string; // 지점명(spot_nm)
+  lat: number;
+  lng: number;
+  year: number;
+  accidents: number; // 사고 건수
+  casualties: number; // 사상자 수
+  deaths: number;
+  serious: number; // 중상
+  minor: number; // 경상
+  sggName?: string; // 시도시군구명
+};
+
 export type Agency = {
   id: string;
   name: string;

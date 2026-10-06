@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MARKER_COLOR, MARKER_LABEL } from "@/lib/geo";
-import type { MarkerKind, Zone } from "@/lib/types";
+import type { Accident, MarkerKind, Zone } from "@/lib/types";
 
 export type MapSignal = {
   id: string;
@@ -20,13 +20,15 @@ type Props = {
   radiusM?: number;
   signals?: MapSignal[];
   zones?: Zone[];
+  /** 어린이보호구역 내 사고다발지역(도로교통공단). 비어 있으면 레이어 없음 */
+  accidents?: Accident[];
   /** 신고 폼: 탭한 위치를 돌려준다 */
   onPick?: (p: { lat: number; lng: number }) => void;
   picked?: { lat: number; lng: number } | null;
   height?: number;
 };
 
-export default function SchoolMap({ center, radiusM = 500, signals = [], zones = [], onPick, picked, height = 380 }: Props) {
+export default function SchoolMap({ center, radiusM = 500, signals = [], zones = [], accidents = [], onPick, picked, height = 380 }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
@@ -69,6 +71,19 @@ export default function SchoolMap({ center, radiusM = 500, signals = [], zones =
         .bindPopup(`<b>어린이보호구역</b><br/>${z.name}${z.cctv ? "<br/>CCTV 있음" : ""}`)
         .addTo(g),
     );
+    // 사고다발지역: 붉은 테두리 원, 크기는 사고 건수에 비례(최소 10 ~ 최대 22px)
+    accidents.forEach((a) =>
+      L.circleMarker([a.lat, a.lng], {
+        radius: Math.min(22, 10 + a.accidents * 2),
+        color: "#b91c1c",
+        weight: 2,
+        dashArray: "3 3",
+        fillColor: "#fecaca",
+        fillOpacity: 0.35,
+      })
+        .bindPopup(`<b>어린이 사고다발지역</b> (${a.year})<br/>${a.name}<br/>사고 ${a.accidents}건 · 사상자 ${a.casualties}명`)
+        .addTo(g),
+    );
     // 신호
     signals.forEach((s) => {
       if (s.lat == null || s.lng == null) return;
@@ -82,7 +97,7 @@ export default function SchoolMap({ center, radiusM = 500, signals = [], zones =
         .bindPopup(`<b>${MARKER_LABEL[s.kind]}</b> · ${s.category}<br/>${s.summary}`)
         .addTo(g);
     });
-  }, [signals, zones, center, radiusM]);
+  }, [signals, zones, accidents, center, radiusM]);
 
   useEffect(() => {
     if (!map.current) return;

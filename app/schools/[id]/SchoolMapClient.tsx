@@ -2,12 +2,12 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import type { MapSignal } from "@/components/SchoolMap";
-import type { School, Zone } from "@/lib/types";
+import type { Accident, School, Zone } from "@/lib/types";
 import { MARKER_LABEL } from "@/lib/geo";
 
 const SchoolMap = dynamic(() => import("@/components/SchoolMap"), { ssr: false });
 
-type Data = { school: School; radiusM: number; signals: MapSignal[]; reviewing: number; zones: Zone[] };
+type Data = { school: School; radiusM: number; signals: MapSignal[]; reviewing: number; zones: Zone[]; accidents: Accident[] };
 
 export default function SchoolMapClient({ schoolId }: { schoolId: string }) {
   const [data, setData] = useState<Data | null>(null);
@@ -24,7 +24,18 @@ export default function SchoolMapClient({ schoolId }: { schoolId: string }) {
         radiusM={data.radiusM}
         signals={data.signals}
         zones={data.zones}
+        accidents={data.accidents ?? []}
       />
+      {(data.accidents ?? []).length === 0 ? (
+        <div className="rounded-xl border border-dashed border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-700">
+          <span className="font-medium">이 학교 주변은 아직 사고다발지역 지도에 없습니다.</span>{" "}
+          <span className="text-zinc-500">사고 기록이 쌓이기 전이라는 뜻이지, 안전하다는 뜻은 아닙니다. 신고가 첫 신호입니다.</span>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+          어린이 사고다발지역 <b>{data.accidents.length}곳</b>이 이 학교 반경 안에 있습니다(도로교통공단, 최근 집계).
+        </div>
+      )}
       <div className="grid grid-cols-4 gap-2 text-center text-sm">
         <Stat n={counts.priority} label={MARKER_LABEL.priority} c="text-orange-600" />
         <Stat n={counts.inprogress} label={MARKER_LABEL.inprogress} c="text-blue-700" />

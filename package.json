@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "load-data": "tsx scripts/load-public-data.ts data/raw/schools.csv data/raw/zones.csv",
-    "seed": "tsx scripts/seed-mock-reports.ts data/mock-reports.json"
+    "seed": "tsx scripts/seed-mock-reports.ts data/mock-reports.json",
+    "load-accidents": "tsx scripts/load-accidents.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

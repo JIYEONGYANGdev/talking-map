@@ -22,11 +22,16 @@
 npm run dev / npm run load-data / npm run seed (모의 신고 투입 + 정확도 출력) / npm run build
 
 ## 10일 일정의 남은 일 (10/7~)
-1. 공공데이터 CSV 적재로 임시 학교 교체 → 모의 신고 12건의 학교명을 실제 이름으로 수정
-2. Claude 호출 실제 테스트, 프롬프트(prompts/v1.ts) 다듬기, npm run seed 정확도 확인
-3. /admin 에서 좌표 보정(지도 클릭) UI — 현재는 PATCH 에 lat/lng 만 받음
-4. 어린이 사고다발지역 API(data.go.kr 15058311) 레이어 — 양주시 결과 0건이면 "사고 지도에 없음" 문구로 대체
+1. 공공데이터 CSV 적재로 임시 학교 교체 → 모의 신고 12건의 학교명을 실제 이름으로 수정 (data/raw/ 에 CSV 2개 필요)
+2. Claude 호출 실제 테스트, 프롬프트(prompts/v1.ts) 다듬기, npm run seed 정확도 확인 (API 키가 조직 범위면 ANTHROPIC_WORKSPACE_ID 필요)
+3. ~~/admin 좌표 보정 UI~~ 완료 10/6: 카드의 "지도에서 위치 보정" → 클릭 → "이 위치로 저장"(PATCH lat/lng → confidence high). low 는 "위치 확인 필요" 배지 + 지도 자동 펼침
+4. ~~사고다발지역 레이어~~ 완료 10/6: scripts/load-accidents.ts(DATA_GO_KR_KEY) → data/accidents.json → /api/schools/:id/signals.accidents → 지도 붉은 점선 원. 0건이면 "아직 사고 지도에 없습니다 — 신고가 첫 신호입니다". 실제 키로 적재는 아직 안 함
 5. 모바일 화면 다듬기(디자이너 와이어프레임 반영), 시연 대본대로 리허설
+
+## 환경 (Mac) — 어기면 전부 막힘
+- 시스템 Node 14 금지. nvm Node 22 (`.nvmrc`). `~/.zshenv` 가 nvm 을 로드하므로 zsh 라면 어디서나 v22. bash -lc 는 아직 v14.
+- `.claude/launch.json` 의 dev 는 `zsh -c "npm run dev"` 로 띄운다(Turbopack 자식 node 도 22 여야 함). `next dev` 와 `next build` 를 동시에 돌리지 말 것(.next 공유). Turbopack 패닉에 `internal/modules/cjs/loader.js` 가 보이면 Node 14 워커 → PATH 고친 뒤 `rm -rf .next`.
+- `lib/ai.ts`: Sonnet 5.5 는 강제 tool_choice 를 거부 → auto + strict. 조직 범위 키는 ANTHROPIC_WORKSPACE_ID 헤더 필요.
 
 ## 작업 분담 규칙 (Code 탭 ↔ Cowork)
 이 폴더에서 열린 Claude Code는 **코드·환경·데이터 적재·테스트**만 담당한다.

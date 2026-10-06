@@ -6,7 +6,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Agency, Report, School, Signal, Status, Zone } from "./types";
+import type { Accident, Agency, Report, School, Signal, Status, Zone } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -19,6 +19,10 @@ export async function getZones(): Promise<Zone[]> {
 }
 export async function getAgencies(): Promise<Agency[]> {
   return readJson<Agency[]>("agencies.json", []);
+}
+/** scripts/load-accidents.ts 가 만든다. 없으면 빈 배열(= "아직 사고 지도에 없음") */
+export async function getAccidents(): Promise<Accident[]> {
+  return readJson<Accident[]>("accidents.json", []);
 }
 
 async function readJson<T>(file: string, fallback: T): Promise<T> {

@@ -1,4 +1,4 @@
-import { getSchools, getZones, store } from "@/lib/db";
+import { getAccidents, getSchools, getZones, store } from "@/lib/db";
 import { distanceM, markerKind, roundCoord } from "@/lib/geo";
 
 const RADIUS_M = 500;
@@ -29,5 +29,10 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     (z) => distanceM(school.lat, school.lng, z.lat, z.lng) <= RADIUS_M * 1.5,
   );
 
-  return Response.json({ school, radiusM: RADIUS_M, signals, reviewing, zones });
+  // 사고다발지역: 학교 반경 안의 지점만. 0건이면 화면이 "아직 사고 지도에 없음"을 보여준다(이 서비스의 문제정의).
+  const accidents = (await getAccidents()).filter(
+    (a) => distanceM(school.lat, school.lng, a.lat, a.lng) <= RADIUS_M * 1.5,
+  );
+
+  return Response.json({ school, radiusM: RADIUS_M, signals, reviewing, zones, accidents });
 }
