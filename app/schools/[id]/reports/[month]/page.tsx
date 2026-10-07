@@ -1,17 +1,12 @@
-import { promises as fs } from "fs";
-import path from "path";
 import Link from "next/link";
-import { getSchools } from "@/lib/db";
+import { getSchools, store } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export default async function MonthlyReportPage({ params }: { params: Promise<{ id: string; month: string }> }) {
   const { id, month } = await params;
   const school = (await getSchools()).find((s) => s.id === id);
-  let report: { total: number; resolved: number; body: string; generatedAt: string } | null = null;
-  try {
-    report = JSON.parse(await fs.readFile(path.join(process.cwd(), "data", "reports", `${id}_${month}.json`), "utf8"));
-  } catch {}
+  const report = await store.getMonthlyReport(id, month);
   return (
     <div className="space-y-4">
       <div className="text-xs text-zinc-500">

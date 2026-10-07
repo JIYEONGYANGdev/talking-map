@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { CATEGORIES, type Agency, type School, type Signal, type Status } from "@/lib/types";
 
@@ -20,26 +20,31 @@ const TABS: { key: Status | "all"; label: string }[] = [
 
 export default function AdminBoard({ schools, agencies }: { schools: School[]; agencies: Agency[] }) {
   const [tab, setTab] = useState<Status | "all">("ai_proposed");
-  const [rows, setRows] = useState<Row[]>([]);
   const [all, setAll] = useState<Row[]>([]);
+  const [version, setVersion] = useState(0); // 올리면 다시 불러온다
   const [busy, setBusy] = useState<string | null>(null);
   const [reportMsg, setReportMsg] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    const r = await fetch("/api/admin/signals");
-    const data: Row[] = await r.json();
-    setAll(data);
-    setRows(tab === "all" ? data : data.filter((s) => s.status === tab));
-  }, [tab]);
+  // 목록은 서버에서 한 번 받아 두고, 탭 필터는 렌더 시 계산한다
   useEffect(() => {
-    load();
-  }, [load]);
+    let alive = true;
+    fetch("/api/admin/signals")
+      .then((r) => r.json())
+      .then((data: Row[]) => {
+        if (alive) setAll(data);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [version]);
+  const rows = tab === "all" ? all : all.filter((s) => s.status === tab);
+  const reload = () => setVersion((v) => v + 1);
 
   async function patch(id: string, body: Record<string, unknown>) {
     setBusy(id);
     await fetch(`/api/admin/signals/${id}`, { method: "PATCH", body: JSON.stringify(body) });
     setBusy(null);
-    load();
+    reload();
   }
 
   async function generateReport(schoolId: string) {

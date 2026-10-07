@@ -35,7 +35,18 @@ async function readJson<T>(file: string, fallback: T): Promise<T> {
 }
 
 // ---------- 동적 데이터(report, signal) ----------
+export type MonthlyReport = {
+  schoolId: string;
+  month: string; // YYYY-MM
+  total: number;
+  resolved: number;
+  body: string;
+  generatedAt: string;
+};
+
 export interface Store {
+  saveMonthlyReport(r: MonthlyReport): Promise<void>;
+  getMonthlyReport(schoolId: string, month: string): Promise<MonthlyReport | null>;
   insertReport(r: Report): Promise<void>;
   getReportByToken(token: string): Promise<Report | null>;
   getReport(id: string): Promise<Report | null>;
@@ -63,7 +74,20 @@ async function saveFile(db: FileDb) {
   await writing;
 }
 
+const REPORTS_DIR = path.join(DATA_DIR, "reports");
+
 const fileStore: Store = {
+  async saveMonthlyReport(r) {
+    await fs.mkdir(REPORTS_DIR, { recursive: true });
+    await fs.writeFile(path.join(REPORTS_DIR, `${r.schoolId}_${r.month}.json`), JSON.stringify(r, null, 2));
+  },
+  async getMonthlyReport(schoolId, month) {
+    try {
+      return JSON.parse(await fs.readFile(path.join(REPORTS_DIR, `${schoolId}_${month}.json`), "utf8")) as MonthlyReport;
+    } catch {
+      return null;
+    }
+  },
   async insertReport(r) {
     const db = await loadFile();
     db.reports.push(r);
@@ -114,6 +138,14 @@ const fromRow = <T>(o: Record<string, unknown> | null): T | null =>
   o ? (Object.fromEntries(Object.entries(o).map(([k, v]) => [k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()), v])) as T) : null;
 
 const supabaseStore: Store = {
+  async saveMonthlyReport(r) {
+    const { error } = await supa().from("monthly_report").upsert(toRow(r), { onConflict: "school_id,month" });
+    if (error) throw error;
+  },
+  async getMonthlyReport(schoolId, month) {
+    const { data } = await supa().from("monthly_report").select("*").eq("school_id", schoolId).eq("month", month).maybeSingle();
+    return fromRow<MonthlyReport>(data);
+  },
   async insertReport(r) {
     const { error } = await supa().from("report").insert(toRow(r));
     if (error) throw error;
@@ -158,7 +190,11 @@ const supabaseStore: Store = {
   },
 };
 
-export const store: Store =
-  process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY ? supabaseStore : fileStore;
+const useSupabase = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY);
+if (!useSupabase && process.env.VERCEL) {
+  // 서버리스 파일시스템은 읽기 전용이고 요청 간에 유지되지 않는다. 신고 접수가 500 으로 실패한다.
+  console.error("[db] SUPABASE_URL / SUPABASE_SERVICE_KEY 가 없어 파일 저장소를 쓰려 합니다. Vercel 에서는 Supabase 가 필수입니다.");
+}
+export const store: Store = useSupabase ? supabaseStore : fileStore;
 
-export const storeKind = process.env.SUPABASE_URL ? "supabase" : "file";
+export const storeKind = useSupabase ? "supabase" : "file";

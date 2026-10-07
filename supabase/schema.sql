@@ -33,6 +33,17 @@ create table if not exists signal (
 create index if not exists signal_status_idx on signal(status);
 create index if not exists signal_school_idx on signal(school_id);
 
+create table if not exists monthly_report (
+  school_id text not null,
+  month text not null, -- YYYY-MM
+  total integer not null,
+  resolved integer not null,
+  body text not null,
+  generated_at timestamptz not null,
+  primary key (school_id, month)
+);
+
 -- 프로토타입은 서비스 키로만 접근하므로 RLS 는 켜 두되 정책 없이 둔다 (anon 차단)
 alter table report enable row level security;
 alter table signal enable row level security;
+alter table monthly_report enable row level security;

@@ -4,6 +4,9 @@ import { maskText } from "@/lib/mask";
 import { classifyReport } from "@/lib/ai";
 import type { Report, Signal } from "@/lib/types";
 
+// 사진 포함 Claude 호출이 10초를 넘길 수 있다 (서버리스 함수 제한 상향)
+export const maxDuration = 60;
+
 /**
  * 신고 접수. 프로토타입에서는 폼이 직접 호출한다(실서비스는 문자 게이트웨이 대역).
  * multipart/form-data: text, address?, lat?, lng?, photo?(file)

@@ -1,8 +1,9 @@
 import { isAdmin } from "@/lib/auth";
 import { getSchools, store } from "@/lib/db";
 import { writeMonthlyReport } from "@/lib/ai";
-import { promises as fs } from "fs";
-import path from "path";
+
+// Claude 호출 포함 — 서버리스 기본 제한(10초)보다 길 수 있다
+export const maxDuration = 60;
 
 /** 월간 리포트 수동 생성(시연용). body: { schoolId, month: "2026-10" } */
 export async function POST(req: Request) {
@@ -24,9 +25,7 @@ export async function POST(req: Request) {
     body,
     generatedAt: new Date().toISOString(),
   };
-  // 프로토타입: data/reports/<school>_<month>.json 에 저장
-  const dir = path.join(process.cwd(), "data", "reports");
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, `${schoolId}_${month}.json`), JSON.stringify(report, null, 2));
+  // 파일 저장소면 data/reports/<school>_<month>.json, Supabase 면 monthly_report 테이블
+  await store.saveMonthlyReport(report);
   return Response.json(report);
 }
