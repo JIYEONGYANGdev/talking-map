@@ -36,6 +36,7 @@
 ## 3. 배포 직후 점검
 ```bash
 BASE=https://talking-map-xxxx.vercel.app
+curl -s $BASE/api/health                            # store 가 "supabase" 이고 env 가 전부 true 여야 함
 curl -s $BASE/api/schools | head -c 200            # 학교 목록(=data/*.json 번들 포함 확인)
 curl -s -X POST $BASE/api/reports -H 'content-type: application/json' \
   -d '{"text":"옥정초 정문 앞 횡단보도 신호등이 꺼져 있어요","address":"옥정초등학교 정문"}'   # ai_proposed 면 Claude + Supabase 정상
