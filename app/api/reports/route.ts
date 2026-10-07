@@ -6,6 +6,7 @@ import type { Report, Signal } from "@/lib/types";
 
 // 사진 포함 Claude 호출이 10초를 넘길 수 있다 (서버리스 함수 제한 상향)
 export const maxDuration = 60;
+const MAX_TEXT_CHARS = 2000;
 
 /**
  * 신고 접수. 프로토타입에서는 폼이 직접 호출한다(실서비스는 문자 게이트웨이 대역).
@@ -45,6 +46,8 @@ export async function POST(req: Request) {
     if (body.source) source = body.source;
   }
   if (!text.trim()) return Response.json({ error: "text required" }, { status: 400 });
+  // 신고 글은 문자 메시지 수준. 잘못 파싱된 바이너리나 과도한 입력이 그대로 AI 호출 비용이 되지 않도록 상한을 둔다.
+  if (text.length > MAX_TEXT_CHARS) return Response.json({ error: `text too long (max ${MAX_TEXT_CHARS} chars)` }, { status: 400 });
 
   const report: Report = {
     id: randomUUID(),

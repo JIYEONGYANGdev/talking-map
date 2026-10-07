@@ -101,6 +101,11 @@ export async function classifyReport(input: ClassifyInput): Promise<ClassifyOutp
     messages: [{ role: "user", content }],
   });
 
+  // AI_DEBUG=1 이면 보낸 블록 구성을 찍는다 (토큰 이상치 추적용)
+  if (process.env.AI_DEBUG) {
+    console.log("[ai-debug] blocks:", content.map((c) => (c.type === "image" ? `image(${c.source.type === "base64" ? c.source.data.length : "?"} chars, ${c.source.type === "base64" ? c.source.media_type : ""})` : `text(${c.type === "text" ? c.text.length : 0} chars)`)).join(", "));
+  }
+  logUsage("classify", res.usage, Boolean(input.photoBase64));
   if (res.stop_reason === "refusal") throw new Error(`refusal: ${res.stop_details?.explanation ?? ""}`);
   const tool = res.content.find((c) => c.type === "tool_use");
   if (!tool || tool.type !== "tool_use") throw new Error(`no tool_use in response (stop_reason=${res.stop_reason})`);
@@ -131,6 +136,14 @@ export async function writeMonthlyReport(school: School, month: string, signals:
       },
     ],
   });
+  logUsage("report", res.usage, false);
   const text = res.content.find((c) => c.type === "text");
   return text && text.type === "text" ? text.text : "";
+}
+
+/** 비용 산정용 토큰 사용량 로그 (서버 콘솔). 예: [ai-usage] classify photo=true in=2950 out=410 cache_read=0 */
+function logUsage(kind: string, u: Anthropic.Usage, photo: boolean) {
+  console.log(
+    `[ai-usage] ${kind} photo=${photo} in=${u.input_tokens} out=${u.output_tokens} cache_write=${u.cache_creation_input_tokens ?? 0} cache_read=${u.cache_read_input_tokens ?? 0}`,
+  );
 }
