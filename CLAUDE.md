@@ -25,7 +25,7 @@ npm run dev / npm run load-data / npm run seed (모의 신고 투입 + 정확도
 1. ~~공공데이터 CSV 적재~~ 완료 10/7: 양주시 초등학교 40(옥정 8·회천 11·기존시가지 21, 법정동 기준), 보호구역 88. 모의 신고는 옥정초(B000027081)·회천새봄초(B000027107)·유양초(B000004741)로 교체. 원본 CSV(CP949)는 ~/Downloads/양주AI미래인재공모전2026/talking-map/, UTF-8 변환본은 data/raw/(git 제외)
 2. Claude 호출 실제 테스트, 프롬프트(prompts/v1.ts) 다듬기, npm run seed 정확도 확인 (API 키가 조직 범위면 ANTHROPIC_WORKSPACE_ID 필요)
 3. ~~/admin 좌표 보정 UI~~ 완료 10/6: 카드의 "지도에서 위치 보정" → 클릭 → "이 위치로 저장"(PATCH lat/lng → confidence high). low 는 "위치 확인 필요" 배지 + 지도 자동 펼침
-4. ~~사고다발지역 레이어~~ 완료 10/6: scripts/load-accidents.ts(DATA_GO_KR_KEY) → data/accidents.json → /api/schools/:id/signals.accidents → 지도 붉은 점선 원. 0건이면 "아직 사고 지도에 없습니다 — 신고가 첫 신호입니다". 실제 키로 적재는 아직 안 함
+4. ~~사고다발지역 레이어~~ 완료 10/6: scripts/load-accidents.ts(DATA_GO_KR_KEY) → data/accidents.json → /api/schools/:id/signals.accidents → 지도 붉은 점선 원. 0건이면 "아직 사고 지도에 없습니다 — 신고가 첫 신호입니다". 10/7 실제 적재: 2020~2024 양주시 1건(2023 옥정동 옥빛초 부근, 사고 2·사상자 2). 스크립트는 .env.local 을 직접 읽음
 5. 모바일 화면 다듬기(디자이너 와이어프레임 반영), 시연 대본대로 리허설
 
 ## 환경 (Mac) — 어기면 전부 막힘

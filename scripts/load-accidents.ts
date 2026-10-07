@@ -1,7 +1,7 @@
 /**
  * 도로교통공단 "어린이보호구역내 어린이 교통사고 다발지역" (data.go.kr 15058311) → data/accidents.json
  *
- * 사용: DATA_GO_KR_KEY=... npx tsx scripts/load-accidents.ts [연도 ...]
+ * 사용: npx tsx scripts/load-accidents.ts [연도 ...]   (.env.local 의 DATA_GO_KR_KEY 를 읽는다)
  *   예) npm run load-accidents            # 최근 5개년(올해-6 ~ 올해-2) 전부 조회
  *       npm run load-accidents 2022 2023  # 지정 연도만
  *
@@ -13,8 +13,17 @@
  *
  * 양주시 결과가 0건이면 그것이 곧 이 서비스의 문제정의다(사고가 쌓이기 전 학교). 빈 배열도 그대로 저장한다.
  */
-import { writeFileSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 import type { Accident } from "../lib/types";
+
+// tsx 로 직접 실행하면 Next 와 달리 .env.local 을 읽지 않는다. 있으면 로드한다(이미 있는 환경변수가 우선).
+for (const f of [".env.local", ".env"]) {
+  if (existsSync(f)) {
+    try {
+      process.loadEnvFile(f);
+    } catch {}
+  }
+}
 
 const KEY_RAW = process.env.DATA_GO_KR_KEY ?? "";
 if (!KEY_RAW) {
