@@ -20,7 +20,7 @@
 
 ## 명령
 npm run dev / npm run load-data / npm run load-accidents / npm run seed (모의 신고 12건 + 정확도) / npm run demo (시연 데이터: 가상 학교 demo-yeonpurun + 신고 8건 + 처리 + 월간 리포트) / npm run build
-- 시연용 가상 학교 "연푸룬초등학교(시연)" id demo-yeonpurun 은 data/schools.json 에 sample:true 로 들어 있고 load-data 가 유지한다. 예시 사진 public/demo-photos/ (그림).
+- 시연용 가상 학교 "연푸룬초등학교(시연)" id demo-yeonpurun 은 data/schools.json 에 sample:true 로 들어 있고 load-data 가 유지한다. 예시 사진 public/demo-photos/*-real.png (실사), 그림 버전은 public/demo-photos/표현 이미지/.
 
 ## 10일 일정의 남은 일 (10/7~)
 1. ~~공공데이터 CSV 적재~~ 완료 10/7: 양주시 초등학교 40(옥정 8·회천 11·기존시가지 21, 법정동 기준), 보호구역 88. 모의 신고는 옥정초(B000027081)·회천새봄초(B000027107)·유양초(B000004741)로 교체. 원본 CSV(CP949)는 ~/Downloads/양주AI미래인재공모전2026/talking-map/, UTF-8 변환본은 data/raw/(git 제외)

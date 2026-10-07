@@ -5,7 +5,8 @@
  * 하는 일
  *  1) 가상 학교 "연푸룬초등학교(시연)" 를 data/schools.json 에 추가 (좌표는 실제 연푸른초등학교 위치, id demo-yeonpurun)
  *     - load-data 를 다시 돌려도 demo-* 학교는 유지된다.
- *  2) 신고 8건을 POST /api/reports 로 접수 (4건은 public/demo-photos 의 예시 사진 포함, Claude 가 실제로 분류)
+ *  2) 신고 8건을 POST /api/reports 로 접수 (4건은 public/demo-photos/*-real.png 실사 포함, Claude 가 실제로 분류)
+ *     - 그림 버전은 public/demo-photos/표현 이미지/ 에 있다 (npm run demo-photos 로 재생성)
  *  3) 공무원 API 로 학교·종류·기관을 시나리오대로 맞춘 뒤
  *     - 2건은 같은 횡단보도(50m 안) → 확정 → 지도에 "점검 우선"(주황)
  *     - 2건 확정 → "처리 중"(파랑)
@@ -31,12 +32,12 @@ type Demo = {
 };
 // 위도 0.0001 ≈ 11m, 경도 0.0001 ≈ 8.8m
 const DEMOS: Demo[] = [
-  { text: "연푸룬초 정문 앞 횡단보도에 아침마다 학원차가 서있어서 애들이 차 사이로 건너요. 어제도 하마터면 사고날뻔", address: "연푸룬초등학교 정문 횡단보도", dLat: 0.0008, dLng: 0.0003, photo: "crosswalk-car.png", category: "불법주정차", agencyId: "yangju-traffic", action: "confirm" },
+  { text: "연푸룬초 정문 앞 횡단보도에 아침마다 학원차가 서있어서 애들이 차 사이로 건너요. 어제도 하마터면 사고날뻔", address: "연푸룬초등학교 정문 횡단보도", dLat: 0.0008, dLng: 0.0003, photo: "crosswalk-car-real.png", category: "불법주정차", agencyId: "yangju-traffic", action: "confirm" },
   { text: "12가3456 흰색 SUV 매일 연푸룬초 정문 횡단보도 위에 주차함. 김철수 아빠가 봤다고 함", dLat: 0.00083, dLng: 0.00036, category: "불법주정차", agencyId: "yangju-traffic", action: "confirm" },
-  { text: "연푸룬초등학교 후문쪽 인도 블럭이 깨져서 튀어나와있음. 애들 발 걸려 넘어짐. 빨리 좀 고쳐주세요", dLat: -0.0006, dLng: -0.0005, photo: "sidewalk.png", category: "인도·도로 파손", agencyId: "yangju-road", action: "resolve" },
-  { text: "저녁에 학원 끝나고 오는 길인데 연푸룬초 옆 공원길 가로등이 두개나 꺼져있어요 너무 어두움. 제 번호 010-1234-5678", dLat: 0.0002, dLng: -0.0012, photo: "streetlight.png", category: "가로등·조명", agencyId: "yangju-road", action: "confirm" },
+  { text: "연푸룬초등학교 후문쪽 인도 블럭이 깨져서 튀어나와있음. 애들 발 걸려 넘어짐. 빨리 좀 고쳐주세요", dLat: -0.0006, dLng: -0.0005, photo: "sidewalk-real.png", category: "인도·도로 파손", agencyId: "yangju-road", action: "resolve" },
+  { text: "저녁에 학원 끝나고 오는 길인데 연푸룬초 옆 공원길 가로등이 두개나 꺼져있어요 너무 어두움. 제 번호 010-1234-5678", dLat: 0.0002, dLng: -0.0012, photo: "streetlight-real.png", category: "가로등·조명", agencyId: "yangju-road", action: "confirm" },
   { text: "연푸룬초 앞 사거리 신호등 초록불이 너무 짧아요 저학년은 다 못건넘", address: "연푸룬초등학교 앞 사거리", dLat: -0.001, dLng: 0.0009, category: "횡단보도·신호등", agencyId: "yangju-police", action: "confirm" },
-  { text: "연푸룬초 가는길 아파트 공사장 덤프트럭이 등교시간에 계속 다녀요 안전요원도 없고", dLat: 0.0015, dLng: -0.0004, photo: "dump-truck.png", category: "공사 구간", agencyId: "construction-owner", action: "resolve" },
+  { text: "연푸룬초 가는길 아파트 공사장 덤프트럭이 등교시간에 계속 다녀요 안전요원도 없고", dLat: 0.0015, dLng: -0.0004, photo: "dump-truck-real.png", category: "공사 구간", agencyId: "construction-owner", action: "resolve" },
   { text: "연푸룬초 애들 등굣길에 맨홀 뚜껑이 덜컹거림 위치는 정문에서 편의점 쪽으로 50m", dLat: -0.0003, dLng: 0.0014, category: "인도·도로 파손", agencyId: "yangju-road", action: "keep" },
   { text: "통학버스가 학교 안으로 못들어가고 큰길에 세워서 애들 내려줘요. 연푸룬초요", address: "연푸룬초등학교 앞 큰길", category: "통학버스·학교 출입구", agencyId: "edu-office", action: "keep" },
 ];
