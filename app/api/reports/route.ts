@@ -1,5 +1,5 @@
 import { randomBytes, randomUUID } from "crypto";
-import { getAgencies, getSchools, store } from "@/lib/db";
+import { getAgencies, getSchools, store, storeKind } from "@/lib/db";
 import { maskText } from "@/lib/mask";
 import { classifyReport } from "@/lib/ai";
 import type { Report, Signal } from "@/lib/types";
@@ -58,7 +58,14 @@ export async function POST(req: Request) {
     lng,
     // 사진 자체는 프로토타입에서 저장하지 않는다(학부모 화면 비노출 원칙). AI 분류에만 쓴다.
   };
-  await store.insertReport(report);
+  try {
+    await store.insertReport(report);
+  } catch (e) {
+    // 서버리스에서 Supabase 미설정·테이블 없음·키 권한 오류가 여기로 온다. 원인을 응답에 남긴다(비밀값 없음).
+    const msg = e instanceof Error ? e.message : JSON.stringify(e);
+    console.error("[reports] insertReport failed:", msg);
+    return Response.json({ error: "storage", detail: msg, store: storeKind }, { status: 500 });
+  }
 
   const [schools, agencies] = await Promise.all([getSchools(), getAgencies()]);
   let signal: Signal;
@@ -110,7 +117,13 @@ export async function POST(req: Request) {
       updatedAt: new Date().toISOString(),
     };
   }
-  await store.insertSignal(signal);
+  try {
+    await store.insertSignal(signal);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : JSON.stringify(e);
+    console.error("[reports] insertSignal failed:", msg);
+    return Response.json({ error: "storage", detail: msg, store: storeKind }, { status: 500 });
+  }
 
   return Response.json({ token: report.token, signalId: signal.id, status: signal.status });
 }
