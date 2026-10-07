@@ -19,7 +19,8 @@
 - data/schools.json(40교)·zones.json(88곳)은 공공데이터 표준데이터 스냅샷(학교 기준일 2026-10-01, 보호구역 2026-07-31). 갱신은 CSV 다시 받아 `iconv -f cp949 -t utf-8` 후 `npm run load-data`. 권역은 지번주소 법정동으로 나눈다(옥정동=옥정, 회천1~4동 관할 7개 동=회천, 나머지=기존시가지).
 
 ## 명령
-npm run dev / npm run load-data / npm run seed (모의 신고 투입 + 정확도 출력) / npm run build
+npm run dev / npm run load-data / npm run load-accidents / npm run seed (모의 신고 12건 + 정확도) / npm run demo (시연 데이터: 가상 학교 demo-yeonpurun + 신고 8건 + 처리 + 월간 리포트) / npm run build
+- 시연용 가상 학교 "연푸룬초등학교(시연)" id demo-yeonpurun 은 data/schools.json 에 sample:true 로 들어 있고 load-data 가 유지한다. 예시 사진 public/demo-photos/ (그림).
 
 ## 10일 일정의 남은 일 (10/7~)
 1. ~~공공데이터 CSV 적재~~ 완료 10/7: 양주시 초등학교 40(옥정 8·회천 11·기존시가지 21, 법정동 기준), 보호구역 88. 모의 신고는 옥정초(B000027081)·회천새봄초(B000027107)·유양초(B000004741)로 교체. 원본 CSV(CP949)는 ~/Downloads/양주AI미래인재공모전2026/talking-map/, UTF-8 변환본은 data/raw/(git 제외)

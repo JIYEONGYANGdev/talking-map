@@ -27,6 +27,16 @@ npm run load-accidents 2023     # 연도 지정
 ```
 `data/accidents.json`에 저장되고 학교 지도에 붉은 점선 원으로 표시된다. 양주시 결과가 0건이면 학교 페이지에 "아직 사고다발지역 지도에 없습니다 — 신고가 첫 신호입니다"가 뜬다. 그 빈 상태가 이 서비스의 문제정의다.
 
+## 시연 데이터 한 번에 만들기
+```bash
+npm run dev            # 다른 터미널
+npm run demo           # 가상 학교 + 신고 8건(사진 4장 포함) + 공무원 처리 + 이번 달 리포트
+```
+- 가상 학교 **연푸룬초등학교(시연)** (`/schools/demo-yeonpurun`)를 만든다. 지도 위치는 실제 연푸른초등학교 자리. `npm run load-data`를 다시 돌려도 유지된다.
+- 신고 8건을 실제 Claude 분류로 접수한 뒤 공무원 API로 처리해 지도에 점검 우선(같은 횡단보도 2건)·처리 중·고쳐짐이 모두 보이고, 2건은 "검토 중"으로 남아 공무원 화면 "AI 제안 대기" 탭에서 확정 시연을 할 수 있다.
+- 예시 사진은 `public/demo-photos/*.png` (그림이며 "[시연용 예시 사진]" 표기). 신고 폼 시연에서 그대로 올리면 된다. 원본 SVG는 `scripts/demo-photos/`, 다시 만들려면 `npm run demo-photos`(macOS).
+- 다시 실행하면 이전 시연 신고를 지우고 새로 만든다. 시연 URL 목록이 끝에 출력된다.
+
 ## 모의 신고 투입 + 정확도
 `data/mock-reports.json`에 `{ text, address?, label:{category, agencyId, schoolId} }` 로 추가한 뒤
 ```bash

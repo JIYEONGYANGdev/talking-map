@@ -59,6 +59,11 @@ const schools: School[] = srows
     };
   })
   .filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lng));
+// 시연용 가상 학교(id demo-*)는 유지한다 (scripts/seed-demo.ts 가 만든다)
+try {
+  const prev: School[] = JSON.parse(readFileSync("data/schools.json", "utf8"));
+  schools.push(...prev.filter((s) => s.id.startsWith("demo-")));
+} catch {}
 writeFileSync("data/schools.json", JSON.stringify(schools, null, 2));
 const byDistrict = schools.reduce<Record<string, string[]>>((m, s) => ((m[s.district] ??= []).push(s.name), m), {});
 console.log(`schools: ${schools.length}`);

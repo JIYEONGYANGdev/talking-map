@@ -9,7 +9,9 @@
     "lint": "eslint",
     "load-data": "tsx scripts/load-public-data.ts data/raw/schools.csv data/raw/zones.csv",
     "seed": "tsx scripts/seed-mock-reports.ts data/mock-reports.json",
-    "load-accidents": "tsx scripts/load-accidents.ts"
+    "load-accidents": "tsx scripts/load-accidents.ts",
+    "demo": "tsx scripts/seed-demo.ts",
+    "demo-photos": "bash scripts/make-demo-photos.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

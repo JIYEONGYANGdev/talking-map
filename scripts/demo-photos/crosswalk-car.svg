@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <rect width="800" height="800" fill="#4a4f55"/>
+  <rect y="0" width="800" height="200" fill="#c9d6e2"/>
+  <rect x="0" y="200" width="800" height="60" fill="#b8b2a6"/>
+  <g fill="#f2f2f2"><rect x="60" y="300" width="80" height="420"/><rect x="200" y="300" width="80" height="420"/><rect x="340" y="300" width="80" height="420"/><rect x="480" y="300" width="80" height="420"/><rect x="620" y="300" width="80" height="420"/></g>
+  <g transform="translate(150 380)"><rect x="0" y="60" width="520" height="180" rx="30" fill="#f4f4f4" stroke="#333" stroke-width="5"/><path d="M80,60 L150,-10 L400,-10 L470,60 Z" fill="#f4f4f4" stroke="#333" stroke-width="5"/><path d="M110,55 L165,5 L270,5 L270,55 Z" fill="#8fb3d9"/><path d="M290,5 L390,5 L440,55 L290,55 Z" fill="#8fb3d9"/><circle cx="110" cy="245" r="48" fill="#222"/><circle cx="110" cy="245" r="22" fill="#999"/><circle cx="420" cy="245" r="48" fill="#222"/><circle cx="420" cy="245" r="22" fill="#999"/><rect x="200" y="170" width="130" height="44" rx="6" fill="#fff" stroke="#333" stroke-width="3"/><text x="265" y="202" text-anchor="middle" font-family="Apple SD Gothic Neo, sans-serif" font-size="28" fill="#333">00가 0000</text></g>
+  <rect x="690" y="120" width="14" height="200" fill="#444"/><rect x="665" y="90" width="64" height="40" rx="6" fill="#1e5aa8"/><text x="697" y="118" text-anchor="middle" font-family="Apple SD Gothic Neo, sans-serif" font-size="22" fill="#fff">30</text>
+  <text x="40" y="60" font-family="Apple SD Gothic Neo, AppleGothic, sans-serif" font-size="30" fill="#1f2a33">[시연용 예시 사진] 정문 앞 횡단보도</text>
+  <text x="40" y="102" font-family="Apple SD Gothic Neo, AppleGothic, sans-serif" font-size="26" fill="#1f2a33">흰색 SUV가 횡단보도 위에 서 있음 (아침 8시)</text>
+</svg>

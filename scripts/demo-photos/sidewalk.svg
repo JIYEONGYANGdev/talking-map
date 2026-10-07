@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <defs><pattern id="tile" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="#b9b2a6"/><rect x="2" y="2" width="96" height="96" fill="#cfc8bb"/></pattern></defs>
+  <rect width="800" height="800" fill="#8a9aa8"/>
+  <rect y="0" width="800" height="260" fill="#9fb4c4"/>
+  <rect x="0" y="260" width="800" height="540" fill="url(#tile)"/>
+  <rect x="0" y="240" width="800" height="24" fill="#6b6b6b"/>
+  <g transform="translate(300 420) rotate(-8)"><rect x="-10" y="-10" width="120" height="120" fill="#a79d8e" stroke="#4a443b" stroke-width="4"/><polygon points="-10,-10 110,-10 60,50" fill="#746a5c"/><polygon points="20,110 110,30 110,110" fill="#5a5147"/><path d="M-10,60 L30,70 L60,20 L110,40" fill="none" stroke="#2b2621" stroke-width="6"/></g>
+  <path d="M250,560 Q320,520 420,600" fill="none" stroke="#2b2621" stroke-width="8" stroke-linecap="round"/>
+  <path d="M420,600 L470,585 M470,585 L510,610" fill="none" stroke="#2b2621" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="560" cy="700" rx="90" ry="26" fill="#6d665c" opacity="0.5"/>
+  <text x="40" y="70" font-family="Apple SD Gothic Neo, AppleGothic, sans-serif" font-size="30" fill="#1f2a33">[시연용 예시 사진] 후문 쪽 인도</text>
+  <text x="40" y="112" font-family="Apple SD Gothic Neo, AppleGothic, sans-serif" font-size="26" fill="#1f2a33">보도블록이 깨져서 튀어나와 있음</text>
+</svg>
