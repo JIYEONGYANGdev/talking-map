@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { School } from "@/lib/types";
@@ -11,6 +11,17 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
   const [text, setText] = useState("");
   const [address, setAddress] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  // 미리보기: FileReader 로 data URL 을 읽어 콜백에서 상태를 바꾼다.
+  // (createObjectURL + cleanup revoke 는 React 개발 모드의 effect 2회 실행 때 URL 이 해제되어 이미지가 깨진다)
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!photo) return;
+    const reader = new FileReader();
+    reader.onload = () => setPhotoUrl(typeof reader.result === "string" ? reader.result : null);
+    reader.readAsDataURL(photo);
+    return () => reader.abort();
+  }, [photo]);
   const [picked, setPicked] = useState<{ lat: number; lng: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ token: string; status: string } | null>(null);
@@ -65,10 +76,49 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
           ))}
         </select>
       </label>
-      <label className="block text-sm">
-        <span className="text-zinc-600">사진</span>
-        <input type="file" accept="image/*" capture="environment" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} className="mt-1 block w-full text-sm" />
-      </label>
+      <div className="text-sm">
+        <span className="text-zinc-600">사진 (선택, 1장)</span>
+        <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} className="sr-only" id="report-photo" />
+        {!photo ? (
+          <label
+            htmlFor="report-photo"
+            className="mt-1 flex h-40 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:border-zinc-400 focus-within:ring-2 focus-within:ring-blue-500"
+          >
+            <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+              <circle cx="12" cy="13" r="3.5" />
+            </svg>
+            <span className="font-medium text-zinc-700">사진 찍기 또는 올리기</span>
+            <span className="text-xs">탭하면 카메라나 앨범이 열립니다</span>
+          </label>
+        ) : (
+          <div className="mt-1 relative overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50">
+            {photoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element -- 로컬 blob 미리보기
+              <img src={photoUrl} alt="올린 사진 미리보기" className="max-h-72 w-full object-contain bg-zinc-900/5" />
+            )}
+            <div className="flex items-center justify-between gap-2 px-3 py-2 text-xs text-zinc-600">
+              <span className="truncate">{photo.name} · {Math.round(photo.size / 1024)}KB</span>
+              <span className="flex gap-3 shrink-0">
+                <button type="button" onClick={() => fileRef.current?.click()} className="text-blue-700 underline">
+                  다른 사진
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPhoto(null);
+                    setPhotoUrl(null);
+                    if (fileRef.current) fileRef.current.value = "";
+                  }}
+                  className="text-zinc-500 underline"
+                >
+                  지우기
+                </button>
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
       <label className="block text-sm">
         <span className="text-zinc-600">무엇을 보셨나요? (평소 쓰시는 말로)</span>
         <textarea value={text} onChange={(e) => setText(e.target.value)} required rows={3} className="mt-1 w-full border rounded-lg px-2 py-2" placeholder="예: 정문 앞 횡단보도에 아침마다 차가 서 있어서 애들이 차 사이로 건너요" />
