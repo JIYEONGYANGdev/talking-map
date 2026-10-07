@@ -11,5 +11,18 @@
     "deaths": 0,
     "serious": 2,
     "minor": 0
+  },
+  {
+    "id": "7283743",
+    "name": "경기 양주시 옥정동(옥정호수초등학교 부근)",
+    "sggName": "경기 양주시1",
+    "lat": 37.823198989306,
+    "lng": 127.099234718435,
+    "year": 2025,
+    "accidents": 2,
+    "casualties": 2,
+    "deaths": 0,
+    "serious": 0,
+    "minor": 2
   }
 ]

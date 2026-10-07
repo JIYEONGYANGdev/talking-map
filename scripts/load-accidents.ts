@@ -39,7 +39,7 @@ const BASE = "https://apis.data.go.kr/B552061/schoolzoneChild/getRestSchoolzoneC
 const thisYear = new Date().getFullYear();
 const years = process.argv.slice(2).length
   ? process.argv.slice(2).map(Number)
-  : Array.from({ length: 5 }, (_, i) => thisYear - 6 + i); // 공개 데이터는 보통 2년 전까지
+  : Array.from({ length: 5 }, (_, i) => thisYear - 5 + i); // 작년까지 5개년 (2026-10 기준 2025 자료 확인됨)
 
 type Item = Record<string, string | number | undefined>;
 const num = (v: string | number | undefined) => {
