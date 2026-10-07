@@ -4,7 +4,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { CATEGORIES, type Agency, type Category, type School, type Signal } from "./types";
-import { CLASSIFY_SYSTEM, REPORT_SYSTEM } from "../prompts/v1";
+import { CLASSIFY_SYSTEM, REPORT_SYSTEM } from "../prompts/v2";
 
 const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
 

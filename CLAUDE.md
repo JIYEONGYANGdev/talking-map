@@ -5,7 +5,7 @@
 양주시 미래인재 AI 공모전 프로토타입(팀 지제가). 제출 10/16. 완성도보다 "한 바퀴가 도는 시연"이 목표.
 
 ## 한 바퀴 (절대 깨지면 안 됨)
-신고 폼(/report: 사진+글+지도 탭) → POST /api/reports → lib/mask.ts 마스킹 → lib/ai.ts Claude 1회 호출(학교 연결·종류·담당기관, tool use JSON) → signal(ai_proposed) 저장 → 공무원 /admin 확정(PATCH /api/admin/signals/:id) → 학부모 /schools/:id 지도 마커 색 변경 → /reports/:token 진행 확인.
+신고 폼(/report: 사진+글+지도 탭) → POST /api/reports → lib/mask.ts 마스킹 → lib/ai.ts Claude 1회 호출(prompts/v2.ts)(학교 연결·종류·담당기관, tool use JSON) → signal(ai_proposed) 저장 → 공무원 /admin 확정(PATCH /api/admin/signals/:id) → 학부모 /schools/:id 지도 마커 색 변경 → /reports/:token 진행 확인.
 
 ## 설계 원칙 (기획안에서 온 것, 바꾸지 말 것)
 - 학교에 점수·순위를 매기지 않는다. 변화(점검 우선/처리 중/고쳐짐)만 보여준다.
@@ -23,7 +23,7 @@ npm run dev / npm run load-data / npm run seed (모의 신고 투입 + 정확도
 
 ## 10일 일정의 남은 일 (10/7~)
 1. ~~공공데이터 CSV 적재~~ 완료 10/7: 양주시 초등학교 40(옥정 8·회천 11·기존시가지 21, 법정동 기준), 보호구역 88. 모의 신고는 옥정초(B000027081)·회천새봄초(B000027107)·유양초(B000004741)로 교체. 원본 CSV(CP949)는 ~/Downloads/양주AI미래인재공모전2026/talking-map/, UTF-8 변환본은 data/raw/(git 제외)
-2. Claude 호출 실제 테스트, 프롬프트(prompts/v1.ts) 다듬기, npm run seed 정확도 확인 (API 키가 조직 범위면 ANTHROPIC_WORKSPACE_ID 필요)
+2. ~~Claude 호출 실제 테스트~~ 완료 10/7: 모의 12건 v1 = 종류 11/12·기관 11/12·학교 11/11 → prompts/v2.ts(규칙 3-1 보행 장애물→인도·도로 파손) = 12/12·12/12·11/11, PII 누출 0. lib/ai.ts 는 v2 사용. 종류 정의·기관 표는 안 바꿈
 3. ~~/admin 좌표 보정 UI~~ 완료 10/6: 카드의 "지도에서 위치 보정" → 클릭 → "이 위치로 저장"(PATCH lat/lng → confidence high). low 는 "위치 확인 필요" 배지 + 지도 자동 펼침
 4. ~~사고다발지역 레이어~~ 완료 10/6: scripts/load-accidents.ts(DATA_GO_KR_KEY) → data/accidents.json → /api/schools/:id/signals.accidents → 지도 붉은 점선 원. 0건이면 "아직 사고 지도에 없습니다 — 신고가 첫 신호입니다". 10/7 실제 적재: 2020~2024 양주시 1건(2023 옥정동 옥빛초 부근, 사고 2·사상자 2). 스크립트는 .env.local 을 직접 읽음
 5. 모바일 화면 다듬기(디자이너 와이어프레임 반영), 시연 대본대로 리허설
@@ -32,6 +32,9 @@ npm run dev / npm run load-data / npm run seed (모의 신고 투입 + 정확도
 - 시스템 Node 14 금지. nvm Node 22 (`.nvmrc`). `~/.zshenv` 가 nvm 을 로드하므로 zsh 라면 어디서나 v22. bash -lc 는 아직 v14.
 - `.claude/launch.json` 의 dev 는 `zsh -c "npm run dev"` 로 띄운다(Turbopack 자식 node 도 22 여야 함). `next dev` 와 `next build` 를 동시에 돌리지 말 것(.next 공유). Turbopack 패닉에 `internal/modules/cjs/loader.js` 가 보이면 Node 14 워커 → PATH 고친 뒤 `rm -rf .next`.
 - `lib/ai.ts`: Sonnet 5.5 는 강제 tool_choice 를 거부 → auto + strict. 조직 범위 키는 ANTHROPIC_WORKSPACE_ID 헤더 필요.
+
+## AI 활용 기록 (공모전 평가용)
+개발 중 AI 가 의미 있게 도운 일은 docs/ai-usage-log.md 에 유형(A~H)별로 날짜와 함께 계속 추가한다. 형식: 무슨 일 → AI 가 한 일 → 사람이 집중할 수 있었던 것.
 
 ## 작업 분담 규칙 (Code 탭 ↔ Cowork)
 이 폴더에서 열린 Claude Code는 **코드·환경·데이터 적재·테스트**만 담당한다.

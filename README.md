@@ -33,6 +33,7 @@ npm run load-accidents 2023     # 연도 지정
 npm run dev            # 다른 터미널
 npm run seed           # 종류/기관/학교 일치율 출력
 ```
+10/7 측정: v1 종류 11/12·기관 11/12·학교 11/11 → v2 12/12·12/12·11/11, 개인정보 누출 0건. 프롬프트를 바꾸면 `prompts/vN.ts`로 복사해 올리고 다시 측정한다.
 
 ## 화면
 | URL | 사용자 |
@@ -45,7 +46,7 @@ npm run seed           # 종류/기관/학교 일치율 출력
 | `/admin` 학교별 점검표 (비밀번호: `ADMIN_PASSWORD`, 기본 `yangju2026`; `.env.example`을 복사했다면 `change-me`) · 신호 카드의 작은 지도를 클릭해 좌표 보정 | 공무원 |
 
 ## 구조
-`app/` 화면·API · `lib/ai.ts` Claude 호출 · `prompts/v1.ts` 프롬프트 · `lib/mask.ts` 개인정보 마스킹 · `lib/db.ts` 파일/Supabase 저장소 · `lib/geo.ts` 마커 색 규칙 · `scripts/` 데이터 적재(학교·보호구역·사고다발지역)·모의 신고 · `data/agencies.json` 담당 기관 표
+`app/` 화면·API · `lib/ai.ts` Claude 호출 · `prompts/v2.ts` 프롬프트(v1 은 비교용) · `lib/mask.ts` 개인정보 마스킹 · `lib/db.ts` 파일/Supabase 저장소 · `lib/geo.ts` 마커 색 규칙 · `scripts/` 데이터 적재(학교·보호구역·사고다발지역)·모의 신고 · `data/agencies.json` 담당 기관 표
 
 ## 실행 환경 주의 (Mac)
 시스템 Node가 14면 Next 16이 돌지 않고 npm 6이 `package-lock.json`을 v1으로 바꿔 버린다. `bash setup-mac.sh`로 nvm + Node 22를 잡고, 터미널마다 `node -v`가 v22인지 확인한다. API 키가 "워크스페이스에 묶이지 않은 키"면 `ANTHROPIC_WORKSPACE_ID`도 넣어야 한다(.env.example 참고).
