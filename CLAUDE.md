@@ -16,6 +16,7 @@
 
 ## 저장소
 - SUPABASE_URL 없으면 data/db.json 파일 저장소(로컬 시연용). Vercel 배포 시 Supabase 필수(supabase/schema.sql: report, signal, monthly_report). 월간 리포트도 store 를 통해 저장(파일 or 테이블). 배포 절차는 docs/deploy.md.
+- **배포본(10/7)**: https://talking-map-2026.vercel.app — Vercel icn1 + Supabase(Seoul), main push 시 자동 배포. 시연 데이터 투입 완료. 상태 확인은 `/api/health`. 커스텀 도메인은 미연결.
 - 서버리스 대비: next.config.ts 가 data/*.json 을 함수 번들에 포함, /api/reports 와 리포트 생성은 maxDuration 60.
 - data/schools.json(40교)·zones.json(88곳)은 공공데이터 표준데이터 스냅샷(학교 기준일 2026-10-01, 보호구역 2026-07-31). 갱신은 CSV 다시 받아 `iconv -f cp949 -t utf-8` 후 `npm run load-data`. 권역은 지번주소 법정동으로 나눈다(옥정동=옥정, 회천1~4동 관할 7개 동=회천, 나머지=기존시가지).
 

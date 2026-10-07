@@ -43,7 +43,9 @@ curl -s -X POST $BASE/api/reports -H 'content-type: application/json' \
 ```
 - `/admin` 로그인 → 방금 신고가 "AI 제안 대기"에 보이면 끝.
 - 시연 데이터를 배포본에도 넣으려면: `BASE=https://... ADMIN_PASSWORD=배포비번 npm run demo` (로컬에서 실행, 배포 서버의 API 를 호출한다).
-  단, 가상 학교 `demo-yeonpurun` 은 `data/schools.json` 에 이미 커밋돼 있어 배포본에도 존재한다.
+  가상 학교 `demo-yeonpurun` 은 `data/schools.json` 에 커밋돼 있어 배포본에도 존재한다.
+  **주의:** "이전 시연 신고 제거"는 로컬 파일 저장소에만 적용된다. Supabase 에 대고 두 번 돌리면 신고가 중복되니, 다시 넣을 때는 Supabase Table Editor 에서 report/signal 을 비우고 돌린다.
+- 2026-10-07 실행 기록: https://talking-map-2026.vercel.app (icn1) 에 한 바퀴 검증 완료, 시연 8건 투입(AI 8/8 일치), 월간 리포트 생성. 점검용 신고 1건은 "해당 없음(dismissed)" 상태로 남아 있다.
 
 ## 4. 커스텀 도메인
 1. Vercel 프로젝트 → **Settings → Domains** → 도메인 입력(예: `talkingmap.kr`, `map.example.kr`).
