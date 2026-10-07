@@ -34,7 +34,7 @@ npm run dev / npm run load-data / npm run seed (모의 신고 투입 + 정확도
 - `lib/ai.ts`: Sonnet 5.5 는 강제 tool_choice 를 거부 → auto + strict. 조직 범위 키는 ANTHROPIC_WORKSPACE_ID 헤더 필요.
 
 ## AI 활용 기록 (공모전 평가용)
-개발 중 AI 가 의미 있게 도운 일은 docs/ai-usage-log.md 에 유형(A~H)별로 날짜와 함께 계속 추가한다. 형식: 무슨 일 → AI 가 한 일 → 사람이 집중할 수 있었던 것.
+docs/ai-usage-log.md 를 계속 갱신한다. **1부 기획 아이템 관점**(서비스 안의 AI: 시민 접점·공무원 업무·신뢰 장치·학부모 소통·측정과 개선·확장 아이디어)과 **2부 개발 과정 관점**(유형 A~G) 둘 다. 기능을 만들거나 바꿀 때 "이 서비스에서 AI 가 하는 일·안 하는 일·안전장치"가 달라지면 1부에, 개발 중 AI 가 사람 대신 해 준 일은 2부에 날짜와 함께 적는다.
 
 ## 작업 분담 규칙 (Code 탭 ↔ Cowork)
 이 폴더에서 열린 Claude Code는 **코드·환경·데이터 적재·테스트**만 담당한다.
