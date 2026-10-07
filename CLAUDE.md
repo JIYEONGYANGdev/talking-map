@@ -16,13 +16,13 @@
 
 ## 저장소
 - SUPABASE_URL 없으면 data/db.json 파일 저장소(로컬 시연용). Vercel 배포 시 Supabase 필수(supabase/schema.sql).
-- data/schools.json 의 3개 학교는 임시 좌표(sample:true). `npm run load-data` 로 공공데이터 CSV(data/raw/)에서 교체.
+- data/schools.json(40교)·zones.json(88곳)은 공공데이터 표준데이터 스냅샷(학교 기준일 2026-10-01, 보호구역 2026-07-31). 갱신은 CSV 다시 받아 `iconv -f cp949 -t utf-8` 후 `npm run load-data`. 권역은 지번주소 법정동으로 나눈다(옥정동=옥정, 회천1~4동 관할 7개 동=회천, 나머지=기존시가지).
 
 ## 명령
 npm run dev / npm run load-data / npm run seed (모의 신고 투입 + 정확도 출력) / npm run build
 
 ## 10일 일정의 남은 일 (10/7~)
-1. 공공데이터 CSV 적재로 임시 학교 교체 → 모의 신고 12건의 학교명을 실제 이름으로 수정 (data/raw/ 에 CSV 2개 필요)
+1. ~~공공데이터 CSV 적재~~ 완료 10/7: 양주시 초등학교 40(옥정 8·회천 11·기존시가지 21, 법정동 기준), 보호구역 88. 모의 신고는 옥정초(B000027081)·회천새봄초(B000027107)·유양초(B000004741)로 교체. 원본 CSV(CP949)는 ~/Downloads/양주AI미래인재공모전2026/talking-map/, UTF-8 변환본은 data/raw/(git 제외)
 2. Claude 호출 실제 테스트, 프롬프트(prompts/v1.ts) 다듬기, npm run seed 정확도 확인 (API 키가 조직 범위면 ANTHROPIC_WORKSPACE_ID 필요)
 3. ~~/admin 좌표 보정 UI~~ 완료 10/6: 카드의 "지도에서 위치 보정" → 클릭 → "이 위치로 저장"(PATCH lat/lng → confidence high). low 는 "위치 확인 필요" 배지 + 지도 자동 펼침
 4. ~~사고다발지역 레이어~~ 완료 10/6: scripts/load-accidents.ts(DATA_GO_KR_KEY) → data/accidents.json → /api/schools/:id/signals.accidents → 지도 붉은 점선 원. 0건이면 "아직 사고 지도에 없습니다 — 신고가 첫 신호입니다". 실제 키로 적재는 아직 안 함

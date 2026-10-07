@@ -1,0 +1,794 @@
+[
+  {
+    "id": "z0",
+    "name": "꿈나무어린이집",
+    "lat": 37.83616124,
+    "lng": 127.053746,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z1",
+    "name": "자연사랑어린이집",
+    "lat": 37.8089226,
+    "lng": 127.0846106,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z2",
+    "name": "예일유아스쿨",
+    "lat": 37.793501,
+    "lng": 126.965101,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z3",
+    "name": "사랑나무어린이집",
+    "lat": 37.81066333,
+    "lng": 127.1106137,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z4",
+    "name": "덕계어린이집",
+    "lat": 37.82147118,
+    "lng": 127.0453314,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z5",
+    "name": "옥정숲속어린이집",
+    "lat": 37.849523,
+    "lng": 127.1013639,
+    "cctv": true,
+    "roadWidth": "3",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z6",
+    "name": "황토어린이집",
+    "lat": 37.78971093,
+    "lng": 127.093612,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z7",
+    "name": "캐슬아이어린이집",
+    "lat": 37.7973766,
+    "lng": 127.0932402,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z8",
+    "name": "이튼스쿨어린이집",
+    "lat": 37.820813,
+    "lng": 127.045179,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z9",
+    "name": "중앙어린이집",
+    "lat": 37.81933611,
+    "lng": 127.049306,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z10",
+    "name": "키즈팜어린이집",
+    "lat": 37.7951121,
+    "lng": 127.0992322,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z11",
+    "name": "예인프리스쿨(예인어린이집 옆)",
+    "lat": 37.8405571,
+    "lng": 127.084414,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z12",
+    "name": "자람어린이집",
+    "lat": 37.83094838,
+    "lng": 127.0994846,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z13",
+    "name": "백석어린이집",
+    "lat": 37.79286115,
+    "lng": 126.9871842,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z14",
+    "name": "몬테소리어린이집",
+    "lat": 37.784581,
+    "lng": 127.026661,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z15",
+    "name": "덕원어린이집",
+    "lat": 37.8689296,
+    "lng": 127.020039,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z16",
+    "name": "한솔어린이집",
+    "lat": 37.89420893,
+    "lng": 126.973516,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z17",
+    "name": "만송어린이집",
+    "lat": 37.796738,
+    "lng": 127.095919,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z18",
+    "name": "꾸러기어린이집",
+    "lat": 37.888013,
+    "lng": 127.0261556,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z19",
+    "name": "곰두리어린이집",
+    "lat": 37.80144016,
+    "lng": 127.090661,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z20",
+    "name": "청담어린이집",
+    "lat": 37.83316162,
+    "lng": 127.0684758,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z21",
+    "name": "덕정삼성어린이집(아이삼성)",
+    "lat": 37.83451489,
+    "lng": 127.0714488,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z22",
+    "name": "예원어린이집",
+    "lat": 37.78564241,
+    "lng": 126.985192,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z23",
+    "name": "키즈웰어린이집",
+    "lat": 37.804737,
+    "lng": 127.0868542,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z24",
+    "name": "회천어린이집",
+    "lat": 37.844843,
+    "lng": 127.066671,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z25",
+    "name": "남면어린이집",
+    "lat": 37.899225,
+    "lng": 126.976108,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z26",
+    "name": "광적어린이집",
+    "lat": 37.81617718,
+    "lng": 126.9812291,
+    "cctv": true,
+    "roadWidth": "3",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z27",
+    "name": "열린숲어린이집",
+    "lat": 37.80600867,
+    "lng": 127.0778986,
+    "cctv": false,
+    "roadWidth": "5",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z28",
+    "name": "별빛아이어린이집",
+    "lat": 37.8199473,
+    "lng": 127.0774863,
+    "cctv": true,
+    "roadWidth": "15",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z29",
+    "name": "유니어린이집(유니유치원)",
+    "lat": 37.79780501,
+    "lng": 127.0735026,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z30",
+    "name": "덕도초등학교",
+    "lat": 37.8411578,
+    "lng": 126.9776373,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z31",
+    "name": "가납초등학교",
+    "lat": 37.81939865,
+    "lng": 126.9824246,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z32",
+    "name": "상수초등학교",
+    "lat": 37.8692227,
+    "lng": 126.9879712,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z33",
+    "name": "남면 양덕분교초등학교",
+    "lat": 37.90860539,
+    "lng": 126.9984126,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z34",
+    "name": "남면초등학교",
+    "lat": 37.89386705,
+    "lng": 126.9757569,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z35",
+    "name": "봉암초등학교",
+    "lat": 37.91072948,
+    "lng": 127.006071,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z36",
+    "name": "상패초등학교",
+    "lat": 37.89802794,
+    "lng": 127.0264769,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z37",
+    "name": "은현초등학교",
+    "lat": 37.86433427,
+    "lng": 127.022747,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z38",
+    "name": "천보초등학교",
+    "lat": 37.82756573,
+    "lng": 127.087463,
+    "cctv": true,
+    "roadWidth": "9",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z39",
+    "name": "양주덕산초등학교",
+    "lat": 37.81819328,
+    "lng": 127.04773,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z40",
+    "name": "덕정초등학교",
+    "lat": 37.84677221,
+    "lng": 127.0640354,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z41",
+    "name": "양주덕현초등학교",
+    "lat": 37.79963817,
+    "lng": 127.0808349,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z42",
+    "name": "유양초등학교",
+    "lat": 37.78606274,
+    "lng": 127.0272166,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z43",
+    "name": "주원초등학교",
+    "lat": 37.83553749,
+    "lng": 127.0728948,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z44",
+    "name": "도둔초등학교",
+    "lat": 37.813784,
+    "lng": 127.0576555,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z45",
+    "name": "신지초등학교",
+    "lat": 37.78830978,
+    "lng": 126.9901958,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z46",
+    "name": "광숭초등학교",
+    "lat": 37.80154501,
+    "lng": 127.107389,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z47",
+    "name": "삼숭초등학교",
+    "lat": 37.796703,
+    "lng": 127.108117,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z48",
+    "name": "덕계초등학교",
+    "lat": 37.82302719,
+    "lng": 127.0474813,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z49",
+    "name": "회천초등학교",
+    "lat": 37.83265642,
+    "lng": 127.0696113,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z50",
+    "name": "회정초등학교",
+    "lat": 37.83020763,
+    "lng": 127.0521659,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z51",
+    "name": "칠봉초등학교",
+    "lat": 37.83808694,
+    "lng": 127.070397,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z52",
+    "name": "고암초등학교",
+    "lat": 37.83516678,
+    "lng": 127.0681674,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z53",
+    "name": "산북초등학교",
+    "lat": 37.80608863,
+    "lng": 127.0391809,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z54",
+    "name": "은봉초등학교",
+    "lat": 37.78135419,
+    "lng": 126.9831929,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z55",
+    "name": "삼상초등학교",
+    "lat": 37.70034708,
+    "lng": 126.9299518,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z56",
+    "name": "송추초등학교",
+    "lat": 37.71620385,
+    "lng": 126.9704422,
+    "cctv": true,
+    "roadWidth": "30",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z57",
+    "name": "연곡초등학교",
+    "lat": 37.80715791,
+    "lng": 126.9611638,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z58",
+    "name": "양주백석초등학교",
+    "lat": 37.79644619,
+    "lng": 126.9866637,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z59",
+    "name": "효촌초등학교",
+    "lat": 37.85794102,
+    "lng": 126.9632755,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z60",
+    "name": "광사초등학교",
+    "lat": 37.79145535,
+    "lng": 127.0838368,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z61",
+    "name": "만송초등학교",
+    "lat": 37.79758453,
+    "lng": 127.0851608,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z62",
+    "name": "연푸른초등학교",
+    "lat": 37.81471492,
+    "lng": 127.0871249,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z63",
+    "name": "율빛초등학교",
+    "lat": 37.81426498,
+    "lng": 127.1023884,
+    "cctv": true,
+    "roadWidth": "15",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z64",
+    "name": "옥빛초등학교",
+    "lat": 37.81458312,
+    "lng": 127.0932335,
+    "cctv": true,
+    "roadWidth": "16",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z65",
+    "name": "쉐마기독학교",
+    "lat": 37.849488,
+    "lng": 127.0265965,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z66",
+    "name": "옥정초등학교",
+    "lat": 37.823341,
+    "lng": 127.0884162,
+    "cctv": true,
+    "roadWidth": "7",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z67",
+    "name": "율정초등학교",
+    "lat": 37.82806456,
+    "lng": 127.096064,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z68",
+    "name": "미예뜰어린이집",
+    "lat": 37.82105795,
+    "lng": 127.1054001,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z69",
+    "name": "행전어린이집",
+    "lat": 37.840824,
+    "lng": 127.066909,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z70",
+    "name": "푸른샘 유치원",
+    "lat": 37.81552535,
+    "lng": 127.0514,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z71",
+    "name": "유니유치원(유니어린이집)",
+    "lat": 37.79755268,
+    "lng": 127.0736068,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z72",
+    "name": "솔빛유치원",
+    "lat": 37.81077807,
+    "lng": 127.0947425,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z73",
+    "name": "양주유치원",
+    "lat": 37.82815926,
+    "lng": 127.0992083,
+    "cctv": true,
+    "roadWidth": "24",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z74",
+    "name": "지엘유치원",
+    "lat": 37.81920885,
+    "lng": 127.0663141,
+    "cctv": true,
+    "roadWidth": "6",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z75",
+    "name": "우정유치원",
+    "lat": 37.803587,
+    "lng": 127.0711646,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z76",
+    "name": "홉그루유치원",
+    "lat": 37.79023216,
+    "lng": 127.0858926,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z77",
+    "name": "송랑유치원",
+    "lat": 37.78956206,
+    "lng": 127.0804833,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z78",
+    "name": "예일유치원",
+    "lat": 37.80104128,
+    "lng": 127.0790424,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z79",
+    "name": "아이림유치원",
+    "lat": 37.805016,
+    "lng": 127.084232,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z80",
+    "name": "노블키즈유치원(어린이집)",
+    "lat": 37.819732,
+    "lng": 126.986625,
+    "cctv": true,
+    "roadWidth": "8",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z81",
+    "name": "아름솔 유치원",
+    "lat": 37.79166153,
+    "lng": 126.9926385,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z82",
+    "name": "사랑유치원",
+    "lat": 37.834928,
+    "lng": 127.070855,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z83",
+    "name": "양주도담학교(특수학교)",
+    "lat": 37.8338562,
+    "lng": 127.081254,
+    "cctv": true,
+    "roadWidth": "12",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z84",
+    "name": "푸른샘초등학교",
+    "lat": 37.81466127,
+    "lng": 127.0509241,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z85",
+    "name": "회암초등학교",
+    "lat": 37.83503513,
+    "lng": 127.0869482,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z86",
+    "name": "옥정호수초등학교",
+    "lat": 37.82329419,
+    "lng": 127.0999516,
+    "cctv": true,
+    "roadWidth": "18",
+    "police": "양주경찰서"
+  },
+  {
+    "id": "z87",
+    "name": "예인어린이집(예인프리스쿨 옆)",
+    "lat": 37.8405571,
+    "lng": 127.084414,
+    "cctv": true,
+    "roadWidth": "4",
+    "police": "양주경찰서"
+  }
+]

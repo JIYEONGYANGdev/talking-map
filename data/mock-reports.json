@@ -1,52 +1,99 @@
 [
   {
-    "text": "옥정A초 정문 앞 횡단보도에 아침마다 학원차가 서있어서 애들이 차 사이로 건너요. 어제도 하마터면 사고날뻔",
-    "address": "옥정A초등학교 정문",
-    "label": { "category": "불법주정차", "agencyId": "yangju-traffic", "schoolId": "sample-okjeong-a" }
+    "text": "옥정초 정문 앞 횡단보도에 아침마다 학원차가 서있어서 애들이 차 사이로 건너요. 어제도 하마터면 사고날뻔",
+    "address": "옥정초등학교 정문",
+    "label": {
+      "category": "불법주정차",
+      "agencyId": "yangju-traffic",
+      "schoolId": "B000027081"
+    }
   },
   {
-    "text": "옥정A초등학교 후문쪽 인도 블럭이 깨져서 튀어나와있음. 애들 발 걸려 넘어짐. 빨리 좀 고쳐주세요",
-    "label": { "category": "인도·도로 파손", "agencyId": "yangju-road", "schoolId": "sample-okjeong-a" }
+    "text": "옥정초등학교 후문쪽 인도 블럭이 깨져서 튀어나와있음. 애들 발 걸려 넘어짐. 빨리 좀 고쳐주세요",
+    "label": {
+      "category": "인도·도로 파손",
+      "agencyId": "yangju-road",
+      "schoolId": "B000027081"
+    }
   },
   {
-    "text": "회천A초 앞 신호등 초록불이 너무 짧아요 저학년은 다 못건넘",
-    "address": "회천A초등학교 앞 사거리",
-    "label": { "category": "횡단보도·신호등", "agencyId": "yangju-police", "schoolId": "sample-hoecheon-a" }
+    "text": "회천새봄초 앞 신호등 초록불이 너무 짧아요 저학년은 다 못건넘",
+    "address": "회천새봄초등학교 앞 사거리",
+    "label": {
+      "category": "횡단보도·신호등",
+      "agencyId": "yangju-police",
+      "schoolId": "B000027107"
+    }
   },
   {
-    "text": "덕정동 회천A초 가는길 아파트 공사장 덤프트럭이 등교시간에 계속 다녀요 안전요원도 없고",
-    "label": { "category": "공사 구간", "agencyId": "construction-owner", "schoolId": "sample-hoecheon-a" }
+    "text": "덕정동 회천새봄초 가는길 아파트 공사장 덤프트럭이 등교시간에 계속 다녀요 안전요원도 없고",
+    "label": {
+      "category": "공사 구간",
+      "agencyId": "construction-owner",
+      "schoolId": "B000027107"
+    }
   },
   {
-    "text": "저녁에 학원 끝나고 오는 길인데 옥정A초 옆 공원길 가로등이 두개나 꺼져있어요 너무 어두움",
-    "label": { "category": "가로등·조명", "agencyId": "yangju-road", "schoolId": "sample-okjeong-a" }
+    "text": "저녁에 학원 끝나고 오는 길인데 옥정초 옆 공원길 가로등이 두개나 꺼져있어요 너무 어두움",
+    "label": {
+      "category": "가로등·조명",
+      "agencyId": "yangju-road",
+      "schoolId": "B000027081"
+    }
   },
   {
-    "text": "통학버스가 학교 안으로 못들어가고 큰길에 세워서 애들 내려줘요. 회천A초요. 010-1234-5678 로 연락주세요",
-    "label": { "category": "통학버스·학교 출입구", "agencyId": "edu-office", "schoolId": "sample-hoecheon-a" }
+    "text": "통학버스가 학교 안으로 못들어가고 큰길에 세워서 애들 내려줘요. 회천새봄초요. 010-1234-5678 로 연락주세요",
+    "label": {
+      "category": "통학버스·학교 출입구",
+      "agencyId": "edu-office",
+      "schoolId": "B000027107"
+    }
   },
   {
-    "text": "기존시가지A초 앞길 차들이 너무 빨리 달려요. 30km 표지판 있는데 아무도 안지킴",
-    "label": { "category": "속도·교통량", "agencyId": "yangju-traffic", "schoolId": "sample-old-a" }
+    "text": "유양초 앞길 차들이 너무 빨리 달려요. 30km 표지판 있는데 아무도 안지킴",
+    "label": {
+      "category": "속도·교통량",
+      "agencyId": "yangju-traffic",
+      "schoolId": "B000004741"
+    }
   },
   {
-    "text": "12가3456 흰색 SUV 매일 옥정A초 앞 횡단보도 위에 주차함 김철수 아빠가 봤다고 함",
-    "label": { "category": "불법주정차", "agencyId": "yangju-traffic", "schoolId": "sample-okjeong-a" }
+    "text": "12가3456 흰색 SUV 매일 옥정초 앞 횡단보도 위에 주차함 김철수 아빠가 봤다고 함",
+    "label": {
+      "category": "불법주정차",
+      "agencyId": "yangju-traffic",
+      "schoolId": "B000027081"
+    }
   },
   {
     "text": "학교 앞에 뭔가 위험한거 같은데 뭐라고 해야할지 모르겠어요 사진 보세요",
-    "label": { "category": "기타", "agencyId": "yangju-safety" }
+    "label": {
+      "category": "기타",
+      "agencyId": "yangju-safety"
+    }
   },
   {
-    "text": "옥정 애들 등굣길에 맨홀 뚜껑이 덜컹거림 위치는 옥정A초 정문에서 편의점 쪽으로 50m",
-    "label": { "category": "인도·도로 파손", "agencyId": "yangju-road", "schoolId": "sample-okjeong-a" }
+    "text": "옥정 애들 등굣길에 맨홀 뚜껑이 덜컹거림 위치는 옥정초 정문에서 편의점 쪽으로 50m",
+    "label": {
+      "category": "인도·도로 파손",
+      "agencyId": "yangju-road",
+      "schoolId": "B000027081"
+    }
   },
   {
-    "text": "회천A초 후문 횡단보도에 신호등이 아예 없어요 애들이 그냥 뛰어서 건넘",
-    "label": { "category": "횡단보도·신호등", "agencyId": "yangju-police", "schoolId": "sample-hoecheon-a" }
+    "text": "회천새봄초 후문 횡단보도에 신호등이 아예 없어요 애들이 그냥 뛰어서 건넘",
+    "label": {
+      "category": "횡단보도·신호등",
+      "agencyId": "yangju-police",
+      "schoolId": "B000027107"
+    }
   },
   {
-    "text": "기존시가지A초 담장 옆 보도에 전동킥보드가 늘 쓰러져 있어서 유모차도 못지나가요",
-    "label": { "category": "인도·도로 파손", "agencyId": "yangju-road", "schoolId": "sample-old-a" }
+    "text": "유양초 담장 옆 보도에 전동킥보드가 늘 쓰러져 있어서 유모차도 못지나가요",
+    "label": {
+      "category": "인도·도로 파손",
+      "agencyId": "yangju-road",
+      "schoolId": "B000004741"
+    }
   }
 ]

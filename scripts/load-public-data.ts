@@ -23,9 +23,24 @@ const pick = (row: Record<string, string>, ...keys: string[]) => {
   return "";
 };
 
-const isYangju = (addr: string) => /양주시/.test(addr);
-const district = (addr: string): School["district"] =>
-  /옥정/.test(addr) ? "옥정" : /회천|덕정|고암|덕계|회암|봉양/.test(addr) ? "회천" : "기존시가지";
+// "남양주시"를 걸러내야 한다. 표준데이터 주소는 "경기도 양주시 …" 형태.
+const isYangju = (addr: string) => /(?<!남)양주시/.test(addr);
+/**
+ * 권역은 지번주소의 법정동(읍·면·동)으로 나눈다. 도로명주소에는 동 이름이 없어 "옥정동로", "회천중앙로" 같은
+ * 도로명에 의존하면 틀린다(예: 회암초 = 옥정서로, 율정초 = 옥정동로).
+ * - 옥정: 옥정동 (행정동 옥정1·2동)
+ * - 회천: 행정동 회천1~4동 관할 법정동 — 덕계동·덕정동·봉양동·회암동·율정동·고암동·회정동
+ * - 기존시가지: 양주1·2동(양주동·유양동·어둔동·남방동·마전동·산북동·광사동·만송동·삼숭동·고읍동)과 읍·면
+ */
+const district = (jibun: string, road = ""): School["district"] => {
+  // 주의: JS 의 \b 는 한글 뒤에서 경계로 잡히지 않으므로 공백/끝 lookahead 를 쓴다
+  const dong = jibun.match(/양주시\s+(?:\S+[읍면]\s+)?(\S+?동)(?=\s|$)/)?.[1] ?? "";
+  if (dong === "옥정동") return "옥정";
+  if (/^(덕계|덕정|봉양|회암|율정|고암|회정)동$/.test(dong)) return "회천";
+  if (dong) return "기존시가지";
+  // 지번주소가 없을 때만 도로명으로 추정
+  return /옥정/.test(road) ? "옥정" : /회천|덕정|고암/.test(road) ? "회천" : "기존시가지";
+};
 
 // 학교
 const srows = parse(readFileSync(schoolsCsv, "utf8"), { columns: true, bom: true, skip_empty_lines: true }) as Record<string, string>[];
@@ -40,12 +55,14 @@ const schools: School[] = srows
       lat: Number(pick(r, "위도")),
       lng: Number(pick(r, "경도")),
       address: addr,
-      district: district(addr),
+      district: district(pick(r, "소재지지번주소"), addr),
     };
   })
   .filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lng));
 writeFileSync("data/schools.json", JSON.stringify(schools, null, 2));
-console.log(`schools: ${schools.length}`, schools.map((s) => `${s.name}(${s.district})`).join(", "));
+const byDistrict = schools.reduce<Record<string, string[]>>((m, s) => ((m[s.district] ??= []).push(s.name), m), {});
+console.log(`schools: ${schools.length}`);
+for (const [d, names] of Object.entries(byDistrict)) console.log(`  ${d} (${names.length}): ${names.join(", ")}`);
 
 // 어린이보호구역
 if (zonesCsv) {
