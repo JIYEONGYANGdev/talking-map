@@ -53,7 +53,7 @@ npm run seed           # 종류/기관/학교 일치율 출력
 | `/report` 신고 폼(문자 게이트웨이 대역) | 학부모 |
 | `/reports/:token` 내 신고 진행 확인 | 학부모 |
 | `/schools/:id/reports/YYYY-MM` 월간 리포트 | 학부모 |
-| `/admin` 학교별 점검표 (비밀번호: `ADMIN_PASSWORD`, 기본 `yangju2026`; `.env.example`을 복사했다면 `change-me`) · 신호 카드의 작은 지도를 클릭해 좌표 보정 | 공무원 |
+| `/admin` 학교별 점검표 (비밀번호: `ADMIN_PASSWORD`, 기본 `yangju2026`; `.env.example`을 복사했다면 `change-me`) · 신호 카드에 접수 사진 썸네일(클릭 확대)과 작은 지도(클릭 좌표 보정) | 공무원 |
 
 ## 구조
 `app/` 화면·API · `lib/ai.ts` Claude 호출 · `prompts/v2.ts` 프롬프트(v1 은 비교용) · `lib/mask.ts` 개인정보 마스킹 · `lib/db.ts` 파일/Supabase 저장소 · `lib/geo.ts` 마커 색 규칙 · `scripts/` 데이터 적재(학교·보호구역·사고다발지역)·모의 신고 · `data/agencies.json` 담당 기관 표

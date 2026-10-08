@@ -47,3 +47,6 @@ create table if not exists monthly_report (
 alter table report enable row level security;
 alter table signal enable row level security;
 alter table monthly_report enable row level security;
+
+-- 접수 사진 (공무원 전용 열람). 비공개 버킷 — 서버의 서비스 키로만 접근. 없으면 코드가 첫 업로드 때 만든다.
+insert into storage.buckets (id, name, public) values ('photos', 'photos', false) on conflict (id) do nothing;

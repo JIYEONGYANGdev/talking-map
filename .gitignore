@@ -48,3 +48,4 @@ data/seed-result.json
 /.claude/launch.json
 /data/db.json
 /tsconfig.tsbuildinfo
+/data/photos/

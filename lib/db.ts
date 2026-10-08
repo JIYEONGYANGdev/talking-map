@@ -44,7 +44,12 @@ export type MonthlyReport = {
   generatedAt: string;
 };
 
+export type PhotoMediaType = "image/jpeg" | "image/png" | "image/webp";
+
 export interface Store {
+  /** 공무원 열람용 사진 저장. 돌려주는 값은 report.photoUrl 에 넣는 내부 경로(공개 URL 아님). */
+  savePhoto(reportId: string, data: Buffer, mediaType: PhotoMediaType): Promise<string>;
+  getPhoto(photoUrl: string): Promise<{ data: Buffer; mediaType: PhotoMediaType } | null>;
   saveMonthlyReport(r: MonthlyReport): Promise<void>;
   getMonthlyReport(schoolId: string, month: string): Promise<MonthlyReport | null>;
   insertReport(r: Report): Promise<void>;
@@ -75,8 +80,27 @@ async function saveFile(db: FileDb) {
 }
 
 const REPORTS_DIR = path.join(DATA_DIR, "reports");
+const PHOTOS_DIR = path.join(DATA_DIR, "photos");
+const EXT: Record<PhotoMediaType, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+const MT_BY_EXT: Record<string, PhotoMediaType> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp" };
+const safePhotoName = (photoUrl: string) => path.basename(photoUrl).replace(/[^a-zA-Z0-9._-]/g, "");
 
 const fileStore: Store = {
+  async savePhoto(reportId, data, mediaType) {
+    await fs.mkdir(PHOTOS_DIR, { recursive: true });
+    const name = `${reportId}.${EXT[mediaType]}`;
+    await fs.writeFile(path.join(PHOTOS_DIR, name), data);
+    return `photos/${name}`;
+  },
+  async getPhoto(photoUrl) {
+    try {
+      const name = safePhotoName(photoUrl);
+      const data = await fs.readFile(path.join(PHOTOS_DIR, name));
+      return { data, mediaType: MT_BY_EXT[name.split(".").pop() ?? ""] ?? "image/jpeg" };
+    } catch {
+      return null;
+    }
+  },
   async saveMonthlyReport(r) {
     await fs.mkdir(REPORTS_DIR, { recursive: true });
     await fs.writeFile(path.join(REPORTS_DIR, `${r.schoolId}_${r.month}.json`), JSON.stringify(r, null, 2));
@@ -137,7 +161,27 @@ const toRow = (o: Record<string, unknown>) =>
 const fromRow = <T>(o: Record<string, unknown> | null): T | null =>
   o ? (Object.fromEntries(Object.entries(o).map(([k, v]) => [k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()), v])) as T) : null;
 
+const PHOTO_BUCKET = "photos"; // 비공개 버킷. 서비스 키로만 읽고 쓴다.
+
 const supabaseStore: Store = {
+  async savePhoto(reportId, data, mediaType) {
+    const name = `${reportId}.${EXT[mediaType]}`;
+    const upload = () => supa().storage.from(PHOTO_BUCKET).upload(name, data, { contentType: mediaType, upsert: true });
+    let { error } = await upload();
+    if (error && /bucket/i.test(error.message)) {
+      // 버킷이 없으면 만들고 한 번 더 (schema.sql 을 안 돌린 경우 대비)
+      await supa().storage.createBucket(PHOTO_BUCKET, { public: false });
+      ({ error } = await upload());
+    }
+    if (error) throw error;
+    return `photos/${name}`;
+  },
+  async getPhoto(photoUrl) {
+    const name = safePhotoName(photoUrl);
+    const { data, error } = await supa().storage.from(PHOTO_BUCKET).download(name);
+    if (error || !data) return null;
+    return { data: Buffer.from(await data.arrayBuffer()), mediaType: MT_BY_EXT[name.split(".").pop() ?? ""] ?? "image/jpeg" };
+  },
   async saveMonthlyReport(r) {
     const { error } = await supa().from("monthly_report").upsert(toRow(r), { onConflict: "school_id,month" });
     if (error) throw error;

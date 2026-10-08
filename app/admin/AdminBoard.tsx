@@ -8,7 +8,7 @@ const SchoolMap = dynamic(() => import("@/components/SchoolMap"), { ssr: false }
 /** 학교도 좌표도 없을 때 지도 중심(양주시청 부근) */
 const YANGJU_CENTER = { lat: 37.7853, lng: 127.0459 };
 
-type Row = Signal & { schoolName: string | null; agencyName: string | null; maskedText: string; rawAddress: string | null; receivedAt: string | null };
+type Row = Signal & { schoolName: string | null; agencyName: string | null; maskedText: string; rawAddress: string | null; receivedAt: string | null; hasPhoto?: boolean };
 
 const TABS: { key: Status | "all"; label: string }[] = [
   { key: "ai_proposed", label: "AI 제안 대기" },
@@ -106,7 +106,10 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
               </span>
               <span className="rounded px-1.5 bg-zinc-100 self-start">{s.status}</span>
             </div>
-            <blockquote className="border-l-2 pl-3 text-zinc-700 whitespace-pre-wrap">{s.maskedText}</blockquote>
+            <div className="flex gap-3">
+              {s.hasPhoto && <Photo reportId={s.reportId} />}
+              <blockquote className="border-l-2 pl-3 text-zinc-700 whitespace-pre-wrap flex-1">{s.maskedText}</blockquote>
+            </div>
             {s.rawAddress && <div className="text-xs text-zinc-500">주소: {s.rawAddress}</div>}
             <div className="text-zinc-800">
               <span className="font-medium">AI 요약</span> {s.aiSummary}
@@ -191,6 +194,26 @@ function LocationFix({ signal: s, schools, busy, onSave }: { signal: Row; school
         </>
       )}
     </div>
+  );
+}
+
+/** 접수 사진 썸네일. 클릭하면 크게. 공무원 전용 API 라 시민 화면엔 없다. */
+function Photo({ reportId }: { reportId: string }) {
+  const [open, setOpen] = useState(false);
+  const src = `/api/admin/reports/${reportId}/photo`;
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)} className="shrink-0 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100 w-24 h-24" title="사진 크게 보기">
+        {/* eslint-disable-next-line @next/next/no-img-element -- 인증 쿠키가 필요한 내부 API 이미지 */}
+        <img src={src} alt="접수 사진" className="w-full h-full object-cover" loading="lazy" />
+      </button>
+      {open && (
+        <div onClick={() => setOpen(false)} className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 cursor-zoom-out">
+          {/* eslint-disable-next-line @next/next/no-img-element -- 인증 쿠키가 필요한 내부 API 이미지 */}
+          <img src={src} alt="접수 사진 크게 보기" className="max-h-full max-w-full rounded-lg shadow-xl" />
+        </div>
+      )}
+    </>
   );
 }
 

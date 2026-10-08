@@ -12,7 +12,7 @@
 - AI 결과는 공무원 확정 전에는 학부모에게 "검토 중"으로만 보인다. 지도에는 confirmed 이후만 표시.
 - AI는 위험 여부를 판단하지 않는다. 종류·위치·담당기관 정리만.
 - 학교는 data/schools.json 목록 밖, 기관은 data/agencies.json 표 밖의 값을 쓰면 서버가 거부한다(lib/ai.ts 하단).
-- 이름·전화·차량번호는 AI 전송 전 마스킹. 사진·신고자·학원·가게 이름은 시민 화면 비노출.
+- 이름·전화·차량번호는 AI 전송 전 마스킹. 사진·신고자·학원·가게 이름은 시민 화면 비노출. 사진은 공무원 전용 API(/api/admin/reports/:id/photo)로만 열람(로컬 data/photos, Supabase 비공개 버킷 photos).
 
 ## 저장소
 - SUPABASE_URL 없으면 data/db.json 파일 저장소(로컬 시연용). Vercel 배포 시 Supabase 필수(supabase/schema.sql: report, signal, monthly_report). 월간 리포트도 store 를 통해 저장(파일 or 테이블). 배포 절차는 docs/deploy.md.

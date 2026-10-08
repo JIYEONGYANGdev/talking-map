@@ -20,6 +20,7 @@ export async function GET(req: Request) {
         schoolName: schools.find((x) => x.id === s.schoolId)?.name ?? null,
         agencyName: agencies.find((a) => a.id === s.agencyId)?.name ?? null,
         maskedText: report?.maskedText ?? "",
+        hasPhoto: Boolean(report?.photoUrl),
         rawAddress: report?.rawAddress ?? null,
         receivedAt: report?.receivedAt ?? null,
       };

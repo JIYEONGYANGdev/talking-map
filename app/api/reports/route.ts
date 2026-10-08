@@ -59,8 +59,16 @@ export async function POST(req: Request) {
     rawAddress: address,
     lat,
     lng,
-    // 사진 자체는 프로토타입에서 저장하지 않는다(학부모 화면 비노출 원칙). AI 분류에만 쓴다.
+    // photoUrl 은 공무원 열람용 내부 경로. 시민 화면에는 절대 내보내지 않는다.
   };
+  if (photoBase64 && photoMediaType) {
+    try {
+      report.photoUrl = await store.savePhoto(report.id, Buffer.from(photoBase64, "base64"), photoMediaType);
+    } catch (e) {
+      // 사진 저장 실패해도 접수는 진행한다 (AI 분류에는 메모리의 사진을 그대로 쓴다)
+      console.error("[reports] savePhoto failed:", e instanceof Error ? e.message : e);
+    }
+  }
   try {
     await store.insertReport(report);
   } catch (e) {

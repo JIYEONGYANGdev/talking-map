@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   },
   // 로컬 전용 파일은 번들에서 뺀다 (원본 CSV 6MB, 파일 저장소, 시드 결과, 리포트 파일)
   outputFileTracingExcludes: {
-    "/*": ["data/raw/**", "data/db.json", "data/seed-result.json", "data/reports/**", "data/mock-reports.json"],
+    "/*": ["data/raw/**", "data/db.json", "data/seed-result.json", "data/reports/**", "data/photos/**", "data/mock-reports.json"],
   },
 };
 
