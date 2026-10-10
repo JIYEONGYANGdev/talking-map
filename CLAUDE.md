@@ -29,7 +29,8 @@
 - data/schools.json(40교)·zones.json(88곳)은 공공데이터 표준데이터 스냅샷(학교 기준일 2026-10-01, 보호구역 2026-07-31). 갱신은 CSV 다시 받아 `iconv -f cp949 -t utf-8` 후 `npm run load-data`. 권역은 지번주소 법정동으로 나눈다(옥정동=옥정, 회천1~4동 관할 7개 동=회천, 나머지=기존시가지).
 
 ## 명령
-npm run dev / npm run load-data / npm run load-accidents / npm run seed (모의 신고 12건 + 정확도) / npm run demo (시연 데이터: 가상 학교 demo-yeonpurun + 신고 8건 + 처리 + 월간 리포트) / npm run build
+npm run dev / npm run load-data / npm run load-accidents / npm run seed (모의 신고 12건 + 정확도) / npm run demo (시연 데이터: 가상 학교 demo-yeonpurun + 신고 8건(사진 6장) + 처리 + 월간 리포트) / npm run build
+- 시연 데이터 초기화: 공무원 로그인 후 `DELETE /api/admin/data` body `{"confirm":"RESET"}` (신고·신호·월간 리포트 전부 삭제, 되돌릴 수 없음). 배포본 재투입은 docs/deploy.md 3절.
 - 시연용 가상 학교 "연푸룬초등학교(시연)" id demo-yeonpurun 은 data/schools.json 에 sample:true 로 들어 있고 load-data 가 유지한다. 예시 사진 public/demo-photos/*-real.png (실사), 그림 버전은 public/demo-photos/표현 이미지/.
 
 ## 10일 일정의 남은 일 (10/7~)
