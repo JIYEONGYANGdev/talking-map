@@ -1,26 +1,38 @@
 /**
  * 모의 신고를 /api/reports 로 일괄 투입한다. (서버가 떠 있어야 함)
  * 사용: BASE=http://localhost:3000 npx tsx scripts/seed-mock-reports.ts data/mock-reports.json
- * 파일 형식: [{ text, address?, schoolHint?, lat?, lng?, label: { category, agencyId } }]
+ * 파일 형식: [{ text, address?, lat?, lng?, photo?(public/demo-photos 파일명), label: { category, agencyId, schoolId? } }]
  * label 은 정확도 검증용 정답. 결과는 data/seed-result.json 에 저장되고 정확도를 출력한다.
  */
-import { readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 
 // localhost 는 Node fetch 가 ::1 을 먼저 시도해 느려질 수 있어 127.0.0.1 을 기본으로 둔다
 const BASE = process.env.BASE ?? "http://127.0.0.1:3000";
 const file = process.argv[2] ?? "data/mock-reports.json";
-type Mock = { text: string; address?: string; lat?: number; lng?: number; label?: { category: string; agencyId: string; schoolId?: string } };
+type Mock = { text: string; address?: string; lat?: number; lng?: number; photo?: string; label?: { category: string; agencyId: string; schoolId?: string } };
 const mocks: Mock[] = JSON.parse(readFileSync(file, "utf8"));
 
 (async () => {
   const results: unknown[] = [];
   let okCat = 0, okAgency = 0, okSchool = 0, labeled = 0;
   for (const m of mocks) {
-    const r = await fetch(`${BASE}/api/reports`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ text: m.text, address: m.address, lat: m.lat, lng: m.lng, source: "mock" }),
-    });
+    // photo 가 있으면 public/demo-photos 의 파일을 multipart 로 같이 보낸다 (사진 판독까지 측정)
+    let r: Response;
+    const photoPath = m.photo ? `public/demo-photos/${m.photo}` : null;
+    if (photoPath && existsSync(photoPath)) {
+      const fd = new FormData();
+      fd.set("text", m.text);
+      if (m.address) fd.set("address", m.address);
+      if (m.lat != null && m.lng != null) { fd.set("lat", String(m.lat)); fd.set("lng", String(m.lng)); }
+      fd.set("photo", new Blob([readFileSync(photoPath)], { type: m.photo!.endsWith(".jpg") ? "image/jpeg" : "image/png" }), m.photo!);
+      r = await fetch(`${BASE}/api/reports`, { method: "POST", body: fd });
+    } else {
+      r = await fetch(`${BASE}/api/reports`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text: m.text, address: m.address, lat: m.lat, lng: m.lng, source: "mock" }),
+      });
+    }
     const out = await r.json();
     // 정확도 측정을 위해 admin API 대신 저장된 signal 을 직접 읽는다 (파일 스토어 기준)
     results.push({ input: m, out });

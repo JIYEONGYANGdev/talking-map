@@ -6,7 +6,8 @@
       "category": "불법주정차",
       "agencyId": "yangju-traffic",
       "schoolId": "B000027081"
-    }
+    },
+    "photo": "crosswalk-car-real.png"
   },
   {
     "text": "옥정초등학교 후문쪽 인도 블럭이 깨져서 튀어나와있음. 애들 발 걸려 넘어짐. 빨리 좀 고쳐주세요",
@@ -14,7 +15,8 @@
       "category": "인도·도로 파손",
       "agencyId": "yangju-road",
       "schoolId": "B000027081"
-    }
+    },
+    "photo": "sidewalk-real.png"
   },
   {
     "text": "회천새봄초 앞 신호등 초록불이 너무 짧아요 저학년은 다 못건넘",
@@ -31,7 +33,8 @@
       "category": "공사 구간",
       "agencyId": "construction-owner",
       "schoolId": "B000027107"
-    }
+    },
+    "photo": "dump-truck-real.png"
   },
   {
     "text": "저녁에 학원 끝나고 오는 길인데 옥정초 옆 공원길 가로등이 두개나 꺼져있어요 너무 어두움",
@@ -39,7 +42,8 @@
       "category": "가로등·조명",
       "agencyId": "yangju-road",
       "schoolId": "B000027081"
-    }
+    },
+    "photo": "streetlight-real.png"
   },
   {
     "text": "통학버스가 학교 안으로 못들어가고 큰길에 세워서 애들 내려줘요. 회천새봄초요. 010-1234-5678 로 연락주세요",
@@ -47,7 +51,8 @@
       "category": "통학버스·학교 출입구",
       "agencyId": "edu-office",
       "schoolId": "B000027107"
-    }
+    },
+    "photo": "schoolbus-real.png"
   },
   {
     "text": "유양초 앞길 차들이 너무 빨리 달려요. 30km 표지판 있는데 아무도 안지킴",
@@ -55,7 +60,8 @@
       "category": "속도·교통량",
       "agencyId": "yangju-traffic-facility",
       "schoolId": "B000004741"
-    }
+    },
+    "photo": "speed-real.png"
   },
   {
     "text": "12가3456 흰색 SUV 매일 옥정초 앞 횡단보도 위에 주차함 김철수 아빠가 봤다고 함",
@@ -63,7 +69,8 @@
       "category": "불법주정차",
       "agencyId": "yangju-traffic",
       "schoolId": "B000027081"
-    }
+    },
+    "photo": "suv-real.png"
   },
   {
     "text": "학교 앞에 뭔가 위험한거 같은데 뭐라고 해야할지 모르겠어요 사진 보세요",
@@ -94,6 +101,7 @@
       "category": "인도·도로 파손",
       "agencyId": "yangju-road",
       "schoolId": "B000004741"
-    }
+    },
+    "photo": "scooter-real.png"
   }
 ]
