@@ -95,15 +95,15 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
             </div>
             <input ref={fileRef} id="report-photo" type="file" accept="image/*" capture="environment" className="sr-only" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} />
             {!photo ? (
-              <label htmlFor="report-photo" className="h-[300px] rounded-[24px] border-2 border-dashed border-[#9FC4B3] bg-white flex flex-col items-center justify-center gap-3 cursor-pointer active:bg-mint-deep">
-                <div className="w-[72px] h-[72px] rounded-full bg-mint-deep flex items-center justify-center text-brand">
+              <label htmlFor="report-photo" className="h-[300px] rounded-2xl border-2 border-dashed border-line-strong bg-white flex flex-col items-center justify-center gap-3 cursor-pointer active:bg-ground-deep">
+                <div className="w-[72px] h-[72px] rounded-full bg-ground-deep flex items-center justify-center text-brand">
                   <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" /><circle cx="12" cy="13" r="3.5" /></svg>
                 </div>
                 <div className="text-[17px] font-bold">사진 찍기</div>
                 <div className="text-[13px] text-muted">또는 앨범에서 올리기</div>
               </label>
             ) : (
-              <div className="rounded-[24px] overflow-hidden bg-white border border-line">
+              <div className="rounded-2xl overflow-hidden bg-white border border-line">
                 {photoUrl && (
                   // eslint-disable-next-line @next/next/no-img-element -- 로컬 미리보기
                   <img src={photoUrl} alt="올린 사진 미리보기" className="w-full max-h-[300px] object-contain bg-ink/5" />
@@ -117,7 +117,7 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
                 </div>
               </div>
             )}
-            <div className="bg-white rounded-2xl px-3.5 py-3 flex gap-2.5 text-[13px] text-muted leading-relaxed">
+            <div className="bg-white border border-line rounded-2xl px-3.5 py-3 flex gap-2.5 text-[13px] text-muted leading-relaxed">
               <svg className="shrink-0 mt-0.5" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
               사진은 공무원만 봅니다. 이름·전화번호·차량번호는 AI에 보내기 전에 지웁니다.
             </div>
@@ -130,7 +130,7 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
               <div className="flex items-center gap-3">
                 {photoUrl && (
                   // eslint-disable-next-line @next/next/no-img-element -- 로컬 미리보기
-                  <img src={photoUrl} alt="" className="w-14 h-14 rounded-[14px] object-cover" />
+                  <img src={photoUrl} alt="" className="w-14 h-14 rounded-lg object-cover" />
                 )}
                 <div>
                   <div className="text-sm font-bold">사진 1장 올렸어요</div>
@@ -151,14 +151,14 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
                 maxLength={2000}
                 autoFocus
                 placeholder="예: 정문 앞 횡단보도에 아침마다 차가 서 있어서 애들이 차 사이로 건너요"
-                className="w-full rounded-[20px] border-[1.5px] border-line bg-white p-4 text-base leading-relaxed outline-none resize-none focus:border-brand"
+                className="w-full rounded-2xl border-[1.5px] border-line bg-white p-4 text-base leading-relaxed outline-none resize-none focus:border-brand"
               />
             </label>
             <div>
               <div className="text-[13px] text-muted mb-2">자주 쓰는 표현을 눌러 넣을 수도 있어요</div>
               <div className="flex flex-wrap gap-2">
                 {CHIPS.map((c) => (
-                  <button key={c} type="button" onClick={() => setText((t) => (t ? `${t.trimEnd()} ${c}` : c))} className="h-9 px-3.5 rounded-full bg-white border border-line text-[13px] font-medium active:bg-mint-deep">
+                  <button key={c} type="button" onClick={() => setText((t) => (t ? `${t.trimEnd()} ${c}` : c))} className="h-9 px-3.5 rounded-full bg-white border border-line text-[13px] font-medium active:bg-ground-deep">
                     {c}
                   </button>
                 ))}
@@ -182,11 +182,11 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
               </select>
             </label>
             {school && (
-              <div className="rounded-[24px] overflow-hidden border border-line">
+              <div className="rounded-2xl overflow-hidden border border-line">
                 <SchoolMap center={{ lat: school.lat, lng: school.lng, name: school.name }} onPick={setPicked} picked={picked} height={300} />
               </div>
             )}
-            <div className="bg-white rounded-2xl px-4 py-3.5 flex items-center gap-3">
+            <div className="bg-white border border-line rounded-2xl px-4 py-3.5 flex items-center gap-3">
               <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${picked ? "bg-danger" : "bg-line"}`} />
               <div className="text-sm">
                 {picked ? (

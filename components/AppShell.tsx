@@ -33,7 +33,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex justify-center">
-      <div className="w-full max-w-[430px] min-h-screen flex flex-col bg-mint">
+      <div className="w-full max-w-[430px] min-h-screen flex flex-col bg-ground">
         <main className={`flex-1 flex flex-col ${hideTab ? "" : "pb-24"}`}>{children}</main>
         {!hideTab && <BottomTab active={tab} />}
       </div>

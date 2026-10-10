@@ -42,7 +42,7 @@ export default function SchoolPicker({ schools, onPick, title = "우리 아이 �
       <ul className="flex flex-col gap-2">
         {list.map((s) => (
           <li key={s.id}>
-            <button type="button" onClick={() => onPick(s.id)} className="w-full h-14 px-4 rounded-2xl bg-white border border-line flex items-center justify-between text-left active:bg-mint-deep">
+            <button type="button" onClick={() => onPick(s.id)} className="w-full h-14 px-4 rounded-2xl bg-white border border-line flex items-center justify-between text-left active:bg-ground-deep">
               <span className="font-bold">{s.name}</span>
               <span className="text-xs text-muted">{s.district}{s.sample ? " · 시연" : ""}</span>
             </button>

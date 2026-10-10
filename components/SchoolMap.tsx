@@ -70,7 +70,7 @@ export default function SchoolMap({ center, radiusM = 500, signals = [], zones =
       .addTo(g);
     // 어린이보호구역
     zones.forEach((z) =>
-      L.circleMarker([z.lat, z.lng], { radius: 5, color: "#7c3aed", fillColor: "#c4b5fd", fillOpacity: 0.9, weight: 1 })
+      L.circleMarker([z.lat, z.lng], { radius: 5, color: "#1b4383", fillColor: "#d3deec", fillOpacity: 0.95, weight: 1.2 })
         .bindPopup(`<b>어린이보호구역</b><br/>${z.name}${z.cctv ? "<br/>CCTV 있음" : ""}`)
         .addTo(g),
     );
@@ -78,10 +78,10 @@ export default function SchoolMap({ center, radiusM = 500, signals = [], zones =
     accidents.forEach((a) =>
       L.circleMarker([a.lat, a.lng], {
         radius: Math.min(22, 10 + a.accidents * 2),
-        color: "#b91c1c",
+        color: "#c2410c",
         weight: 2,
         dashArray: "3 3",
-        fillColor: "#fecaca",
+        fillColor: "#fff4ec",
         fillOpacity: 0.35,
       })
         .bindPopup(`<b>어린이 사고다발지역</b> (${a.year})<br/>${a.name}<br/>사고 ${a.accidents}건 · 사상자 ${a.casualties}명`)
@@ -108,7 +108,7 @@ export default function SchoolMap({ center, radiusM = 500, signals = [], zones =
     pickRef.current = null;
     if (picked) {
       pickRef.current = L.marker([picked.lat, picked.lng], {
-        icon: L.divIcon({ className: "", html: '<div style="width:16px;height:16px;border-radius:50%;background:#dc2626;border:2px solid #fff;box-shadow:0 0 0 2px #dc2626"></div>', iconSize: [16, 16], iconAnchor: [8, 8] }),
+        icon: L.divIcon({ className: "", html: '<div style="width:16px;height:16px;border-radius:50%;background:#c2410c;border:2px solid #fff;box-shadow:0 0 0 2px #c2410c"></div>', iconSize: [16, 16], iconAnchor: [8, 8] }),
       }).addTo(map.current);
     }
   }, [picked]);

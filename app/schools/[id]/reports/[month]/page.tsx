@@ -20,20 +20,20 @@ export default async function MonthlyReportPage({ params }: { params: Promise<{ 
       </div>
       <h1 className="text-[22px] font-bold leading-snug">{y}년 {Number(m)}월<br />우리 학교 길 리포트</h1>
       {!report ? (
-        <div className="bg-white rounded-[24px] p-6 flex flex-col items-center text-center gap-3">
+        <div className="bg-white border border-line rounded-2xl p-6 flex flex-col items-center text-center gap-3">
           <Mascot size={64} mood="progress" />
           <div className="font-bold">아직 이 달 리포트가 없어요</div>
           <p className="text-sm text-muted leading-relaxed">매달 1일에 만들어져요. 그동안 쌓인 신호는 학교 지도에서 볼 수 있어요.</p>
         </div>
       ) : (
-        <article className="bg-white rounded-[24px] p-5 flex flex-col gap-4">
+        <article className="bg-white border border-line rounded-2xl p-5 flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="bg-mint rounded-[18px] py-3.5 flex flex-col items-center gap-1">
+            <div className="bg-ground rounded-xl py-3.5 flex flex-col items-center gap-1">
               <div className="text-[26px] font-bold leading-none">{report.total}</div>
               <div className="text-xs text-muted">이번 달 신호</div>
             </div>
-            <div className="bg-mint rounded-[18px] py-3.5 flex flex-col items-center gap-1">
-              <div className="text-[26px] font-bold leading-none text-brand-dark">{report.resolved}</div>
+            <div className="bg-ground rounded-xl py-3.5 flex flex-col items-center gap-1">
+              <div className="text-[26px] font-bold leading-none text-done-ink">{report.resolved}</div>
               <div className="text-xs text-muted">고쳐짐</div>
             </div>
           </div>

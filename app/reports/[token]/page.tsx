@@ -40,7 +40,7 @@ export default async function ProgressPage({ params, searchParams }: { params: P
       </div>
 
       {isNew && (
-        <div className="bg-white rounded-[24px] p-5 flex items-center gap-3.5">
+        <div className="bg-white border border-line rounded-2xl p-5 flex items-center gap-3.5">
           <Mascot size={56} />
           <div>
             <div className="font-bold text-[17px]">접수됐어요, 고마워요!</div>
@@ -49,13 +49,13 @@ export default async function ProgressPage({ params, searchParams }: { params: P
         </div>
       )}
 
-      <div className="bg-white rounded-[20px] px-[18px] py-4 flex flex-col gap-4">
+      <div className="bg-white border border-line rounded-2xl px-[18px] py-4 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-2.5">
           <div>
             <div className="text-xs text-muted">{new Date(report.receivedAt).toLocaleString("ko-KR")} 접수</div>
             <div className="text-[15px] font-bold leading-snug mt-1">{report.maskedText}</div>
           </div>
-          <span className={`shrink-0 h-[26px] px-2.5 rounded-full text-xs font-bold inline-flex items-center ${status === "resolved" ? "bg-brand-soft text-brand-dark" : status === "confirmed" ? "bg-progress-soft text-progress-ink" : "bg-review-soft text-muted"}`}>
+          <span className={`shrink-0 h-[26px] px-2.5 rounded-full text-xs font-bold inline-flex items-center ${status === "resolved" ? "bg-done-soft text-done-ink" : status === "confirmed" ? "bg-progress-soft text-progress-ink" : "bg-review-soft text-muted"}`}>
             {PUBLIC_STATUS[status]}
           </span>
         </div>
@@ -75,7 +75,7 @@ export default async function ProgressPage({ params, searchParams }: { params: P
           )}
         </dl>
         {!confirmed && (
-          <div className="text-[13px] text-muted leading-relaxed bg-mint rounded-[14px] px-3 py-2.5 flex gap-2.5 items-start">
+          <div className="text-[13px] text-muted leading-relaxed bg-ground rounded-lg px-3 py-2.5 flex gap-2.5 items-start">
             <Mascot size={22} mood={mood} />
             <span>지금은 공무원이 확인하는 중이에요. 확인되면 종류·담당 기관이 보이고 학교 지도에 점으로 표시됩니다.</span>
           </div>

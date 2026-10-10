@@ -12,7 +12,7 @@ export default function SchoolsIndex({ schools }: { schools: School[] }) {
   useEffect(() => {
     if (ready && schoolId && known) router.replace(`/schools/${schoolId}`);
   }, [ready, schoolId, known, router]);
-  if (!ready || (schoolId && known)) return <div className="px-5 pt-5"><div className="h-[380px] rounded-[20px] bg-white/60 animate-pulse" /></div>;
+  if (!ready || (schoolId && known)) return <div className="px-5 pt-5"><div className="h-[380px] rounded-2xl bg-white/60 animate-pulse" /></div>;
   return (
     <SchoolPicker
       schools={schools}
