@@ -77,7 +77,10 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
 
   const rows = useMemo(() => {
     const kw = q.trim();
-    return all.filter((s) => (tab === "all" || s.status === tab) && (!schoolFilter || s.schoolId === schoolFilter) && (!kw || `${s.maskedText} ${s.aiSummary} ${s.schoolName ?? ""} ${s.category}`.includes(kw)));
+    return all
+      .filter((s) => (tab === "all" || s.status === tab) && (!schoolFilter || s.schoolId === schoolFilter) && (!kw || `${s.maskedText} ${s.aiSummary} ${s.schoolName ?? ""} ${s.category}`.includes(kw)))
+      // 사진이 있는 신고를 맨 위에. 같은 그룹 안에서는 서버 정렬(최신순) 유지 (sort 는 안정 정렬)
+      .sort((a, b) => Number(Boolean(b.hasPhoto)) - Number(Boolean(a.hasPhoto)));
   }, [all, tab, schoolFilter, q]);
 
   // 지표
