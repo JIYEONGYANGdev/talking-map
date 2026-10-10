@@ -40,7 +40,7 @@ export const MARKER_LABEL: Record<MarkerKind, string> = {
   resolved: "고쳐짐",
 };
 export const MARKER_COLOR: Record<MarkerKind, string> = {
-  priority: "#e8731a",
-  inprogress: "#2f6fe4",
-  resolved: "#2a9d5c",
+  priority: "#e8731a", // 점검 우선 (globals.css --color-priority)
+  inprogress: "#2f6fe4", // 처리 중 (--color-progress)
+  resolved: "#1f8a5b", // 고쳐짐 = 브랜드 초록 (--color-brand)
 };

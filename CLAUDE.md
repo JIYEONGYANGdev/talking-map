@@ -14,6 +14,13 @@
 - 학교는 data/schools.json 목록 밖, 기관은 data/agencies.json 표 밖의 값을 쓰면 서버가 거부한다(lib/ai.ts 하단).
 - 이름·전화·차량번호는 AI 전송 전 마스킹. 사진·신고자·학원·가게 이름은 시민 화면 비노출. 사진은 공무원 전용 API(/api/admin/reports/:id/photo)로만 열람(로컬 data/photos, Supabase 비공개 버킷 photos).
 
+## 화면 구조·디자인 (2026-10-10 개편, 시안: docs/design 캔버스)
+- 학부모 화면은 모바일 폭(최대 430px) + 하단 탭 3개(홈 `/`, 지도 `/schools`→기억된 학교, 내 신고 `/my`). 공무원 `/admin`은 넓은 폭. 틀은 components/AppShell.tsx.
+- 색은 의미로만: 브랜드 초록 #1F8A5B(주요 버튼·활성 탭·고쳐짐), 주황 #E8731A(점검 우선), 파랑 #2F6FE4(처리 중), 회색(검토 중), 바탕 민트 #EEF5F1. 토큰은 app/globals.css `@theme`(bg-brand, text-muted, border-line …). 서체 Noto Sans KR.
+- 신고는 3단계 한 컴포넌트(app/report/ReportForm.tsx): 사진 → 한 줄(표현 칩) → 위치·보내기. 종류 선택 없음. 신고 중에는 하단 탭 숨김.
+- 기기 저장(lib/local.ts, localStorage): 고른 학교 `tm_school`, 내 신고 토큰 `tm_reports`. 로그인 없음. 진행 확인 페이지를 열면 그 신고도 기기에 기억.
+- 캐릭터 "핀이"(components/Mascot.tsx)는 빈 상태·안내에만. 데이터 위에 올리지 않는다.
+
 ## 저장소
 - SUPABASE_URL 없으면 data/db.json 파일 저장소(로컬 시연용). Vercel 배포 시 Supabase 필수(supabase/schema.sql: report, signal, monthly_report). 월간 리포트도 store 를 통해 저장(파일 or 테이블). 배포 절차는 docs/deploy.md.
 - **배포본(10/7)**: https://talking-map-2026.vercel.app — Vercel icn1 + Supabase(Seoul), main push 시 자동 배포. 시연 데이터 투입 완료. 상태 확인은 `/api/health`. 커스텀 도메인은 미연결.
@@ -29,7 +36,7 @@ npm run dev / npm run load-data / npm run load-accidents / npm run seed (모의 
 2. ~~Claude 호출 실제 테스트~~ 완료 10/7: 모의 12건 v1 = 종류 11/12·기관 11/12·학교 11/11 → prompts/v2.ts(규칙 3-1 보행 장애물→인도·도로 파손) = 12/12·12/12·11/11, PII 누출 0. lib/ai.ts 는 v2 사용. 종류 정의·기관 표는 안 바꿈
 3. ~~/admin 좌표 보정 UI~~ 완료 10/6: 카드의 "지도에서 위치 보정" → 클릭 → "이 위치로 저장"(PATCH lat/lng → confidence high). low 는 "위치 확인 필요" 배지 + 지도 자동 펼침
 4. ~~사고다발지역 레이어~~ 완료 10/6: scripts/load-accidents.ts(DATA_GO_KR_KEY) → data/accidents.json → /api/schools/:id/signals.accidents → 지도 붉은 점선 원. 0건이면 "아직 사고 지도에 없습니다 — 신고가 첫 신호입니다". 10/7 실제 적재: 2020~2024 양주시 1건(2023 옥정동 옥빛초 부근, 사고 2·사상자 2). 스크립트는 .env.local 을 직접 읽음
-5. 모바일 화면 다듬기(디자이너 와이어프레임 반영), 시연 대본대로 리허설
+5. ~~모바일 화면 다듬기~~ 10/10 시안대로 학부모 화면 전면 개편 완료(홈·신고 3단계·지도 탭·내 신고·진행 확인·월간 리포트). 남은 것: 시연 대본대로 리허설, 공무원 화면 모바일 대응
 
 ## 환경 (Mac) — 어기면 전부 막힘
 - 시스템 Node 14 금지. nvm Node 22 (`.nvmrc`). `~/.zshenv` 가 nvm 을 로드하므로 zsh 라면 어디서나 v22. bash -lc 는 아직 v14.
@@ -49,3 +56,8 @@ docs/ai-usage-log.md 를 계속 갱신한다. **1부 기획 아이템 관점**(�
 - API 키 발급, 결제, 계정 생성 같은 사람이 해야 하는 절차 안내
 반대로 Cowork에서 코드 수정 요청이 오면 "코드는 Code 탭에서" 라고 안내한다.
 판단이 애매하면(예: README 수정, 시연용 데이터 문구) 코드 쪽에서 처리한다.
+
+## 담당 기관 표 갱신 (2026-10-10, Cowork에서 양주시 조직도 분석 후 수정)
+- data/agencies.json 을 실제 과·팀 기준으로 교체(백업: data/agencies.backup-2026-10-10.json). id 는 유지하고 이름·근거를 고쳤으며, `yangju-traffic-facility`(교통과 교통시설팀, 속도·교통량) 1개를 추가. 기존 `yangju-traffic` 은 차량관리과(불법주정차), `yangju-safety` 는 민원여권과 민원행정팀(기타 배분)으로 의미가 바뀜. `note` 필드는 내부 메모(프롬프트에는 안 들어감, Agency 타입에 없음 — 타입에 optional 로 추가해도 됨).
+- data/mock-reports.json 의 속도·교통량 1건 라벨을 `yangju-traffic-facility` 로 변경. **Code 탭에서 할 일**: `npm run seed` 로 정확도 재측정(기관 12/12 유지 확인) → 커밋·push(배포본 반영). /admin 카드와 /reports/:token 의 담당 기관 이름이 "양주시 교통 부서" → "양주시 차량관리과 (차량관리팀)" 식으로 바뀌므로 발표자료 시연 캡처는 재배포 후 다시 찍는다.
+- 근거: 양주시청 행정조직도(contents.do?key=377)·부서별 업무내용(selectEmployeeList.do). 시민안전과는 교통·통학로 업무가 없고(어린이놀이시설·재난), 통학로 민원은 도로교통국의 교통과·차량관리과·도로관리과에 걸쳐 있음.

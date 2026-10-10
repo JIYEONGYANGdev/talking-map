@@ -26,9 +26,11 @@ type Props = {
   onPick?: (p: { lat: number; lng: number }) => void;
   picked?: { lat: number; lng: number } | null;
   height?: number;
+  /** 확대·축소 버튼 위치. 지도 위에 칩을 올리는 화면은 오른쪽 아래가 안 가린다 */
+  zoomPosition?: L.ControlPosition;
 };
 
-export default function SchoolMap({ center, radiusM = 500, signals = [], zones = [], accidents = [], onPick, picked, height = 380 }: Props) {
+export default function SchoolMap({ center, radiusM = 500, signals = [], zones = [], accidents = [], onPick, picked, height = 380, zoomPosition = "bottomright" }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
@@ -36,7 +38,8 @@ export default function SchoolMap({ center, radiusM = 500, signals = [], zones =
 
   useEffect(() => {
     if (!el.current || map.current) return;
-    map.current = L.map(el.current, { zoomControl: true }).setView([center.lat, center.lng], 16);
+    map.current = L.map(el.current, { zoomControl: false }).setView([center.lat, center.lng], 16);
+    L.control.zoom({ position: zoomPosition }).addTo(map.current);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "© OpenStreetMap",
       maxZoom: 19,
@@ -110,5 +113,5 @@ export default function SchoolMap({ center, radiusM = 500, signals = [], zones =
     }
   }, [picked]);
 
-  return <div ref={el} style={{ height }} className="w-full rounded-xl overflow-hidden border border-zinc-200" />;
+  return <div ref={el} style={{ height }} className="w-full overflow-hidden" />;
 }
