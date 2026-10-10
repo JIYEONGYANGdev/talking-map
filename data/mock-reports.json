@@ -53,7 +53,7 @@
     "text": "유양초 앞길 차들이 너무 빨리 달려요. 30km 표지판 있는데 아무도 안지킴",
     "label": {
       "category": "속도·교통량",
-      "agencyId": "yangju-traffic",
+      "agencyId": "yangju-traffic-facility",
       "schoolId": "B000004741"
     }
   },

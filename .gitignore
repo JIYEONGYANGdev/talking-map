@@ -49,3 +49,5 @@ data/seed-result.json
 /data/db.json
 /tsconfig.tsbuildinfo
 /data/photos/
+/docs/demo/
+/docs/presentation/
