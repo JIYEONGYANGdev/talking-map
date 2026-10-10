@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import Mascot from "@/components/Mascot";
 import { CATEGORIES, type Agency, type School, type Signal, type Status } from "@/lib/types";
 
 const SchoolMap = dynamic(() => import("@/components/SchoolMap"), { ssr: false });
@@ -12,32 +13,51 @@ type Row = Signal & { schoolName: string | null; agencyName: string | null; mask
 
 const TABS: { key: Status | "all"; label: string }[] = [
   { key: "ai_proposed", label: "AI 제안 대기" },
-  { key: "received", label: "AI 실패·직접 검토" },
+  { key: "received", label: "직접 검토" },
   { key: "confirmed", label: "처리 중" },
   { key: "resolved", label: "고쳐짐" },
+  { key: "dismissed", label: "해당 없음" },
   { key: "all", label: "전체" },
 ];
 
+const STATUS_PILL: Record<Status, { label: string; cls: string }> = {
+  ai_proposed: { label: "AI 제안", cls: "bg-review-soft text-muted" },
+  received: { label: "AI 실패 · 직접 검토", cls: "bg-priority-soft text-priority-ink" },
+  confirmed: { label: "처리 중", cls: "bg-progress-soft text-progress-ink" },
+  resolved: { label: "고쳐짐", cls: "bg-done-soft text-done-ink" },
+  dismissed: { label: "해당 없음", cls: "bg-review-soft text-muted" },
+};
+
+/**
+ * 공무원 점검표 (데스크톱 기준).
+ * 위: 지표 4개 → 도구 줄(상태 탭·학교·검색·리포트) → 신호 카드(사진 | 내용·AI 정리 | 조치).
+ * 모든 쓰기는 PATCH /api/admin/signals/:id 하나로 간다.
+ */
 export default function AdminBoard({ schools, agencies }: { schools: School[]; agencies: Agency[] }) {
   const [tab, setTab] = useState<Status | "all">("ai_proposed");
+  const [schoolFilter, setSchoolFilter] = useState("");
+  const [q, setQ] = useState("");
   const [all, setAll] = useState<Row[]>([]);
-  const [version, setVersion] = useState(0); // 올리면 다시 불러온다
+  const [loaded, setLoaded] = useState(false);
+  const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
+  const [reportSchool, setReportSchool] = useState(schools[0]?.id ?? "");
   const [reportMsg, setReportMsg] = useState<string | null>(null);
 
-  // 목록은 서버에서 한 번 받아 두고, 탭 필터는 렌더 시 계산한다
   useEffect(() => {
     let alive = true;
     fetch("/api/admin/signals")
       .then((r) => r.json())
       .then((data: Row[]) => {
-        if (alive) setAll(data);
+        if (alive) {
+          setAll(data);
+          setLoaded(true);
+        }
       });
     return () => {
       alive = false;
     };
   }, [version]);
-  const rows = tab === "all" ? all : all.filter((s) => s.status === tab);
   const reload = () => setVersion((v) => v + 1);
 
   async function patch(id: string, body: Record<string, unknown>) {
@@ -47,103 +67,153 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
     reload();
   }
 
-  async function generateReport(schoolId: string) {
+  async function generateReport() {
+    if (!reportSchool) return;
     setReportMsg("리포트 생성 중…");
     const month = new Date().toISOString().slice(0, 7);
-    const r = await fetch("/api/admin/reports/generate", { method: "POST", body: JSON.stringify({ schoolId, month }) });
-    setReportMsg(r.ok ? `생성됨 → /schools/${schoolId}/reports/${month}` : "실패");
+    const r = await fetch("/api/admin/reports/generate", { method: "POST", body: JSON.stringify({ schoolId: reportSchool, month }) });
+    setReportMsg(r.ok ? `생성됨 → /schools/${reportSchool}/reports/${month}` : "생성 실패");
   }
 
-  // 상단 지표 3개
+  const rows = useMemo(() => {
+    const kw = q.trim();
+    return all.filter((s) => (tab === "all" || s.status === tab) && (!schoolFilter || s.schoolId === schoolFilter) && (!kw || `${s.maskedText} ${s.aiSummary} ${s.schoolName ?? ""} ${s.category}`.includes(kw)));
+  }, [all, tab, schoolFilter, q]);
+
+  // 지표
+  const waiting = all.filter((s) => s.status === "ai_proposed" || s.status === "received").length;
+  const inProgress = all.filter((s) => s.status === "confirmed").length;
+  const month = new Date().toISOString().slice(0, 7);
+  const resolvedThisMonth = all.filter((s) => s.status === "resolved" && (s.resolvedAt ?? "").startsWith(month)).length;
   const confirmedAll = all.filter((s) => s.status === "confirmed" || s.status === "resolved");
-  const resolvedRate = confirmedAll.length ? Math.round((all.filter((s) => s.status === "resolved").length / confirmedAll.length) * 100) : 0;
-  const leadTimes = confirmedAll.filter((s) => s.confirmedAt && s.receivedAt).map((s) => (Date.parse(s.confirmedAt!) - Date.parse(s.receivedAt!)) / 3600000);
-  const medianLead = leadTimes.length ? leadTimes.sort((a, b) => a - b)[Math.floor(leadTimes.length / 2)] : null;
+  const leadTimes = confirmedAll.filter((s) => s.confirmedAt && s.receivedAt).map((s) => (Date.parse(s.confirmedAt!) - Date.parse(s.receivedAt!)) / 3600000).sort((a, b) => a - b);
+  const medianLead = leadTimes.length ? leadTimes[Math.floor(leadTimes.length / 2)] : null;
+  const leadLabel = medianLead == null ? "—" : medianLead < 1 ? "1시간 이내" : medianLead < 48 ? `${Math.round(medianLead)}시간` : `${Math.round(medianLead / 24)}일`;
+  const count = (k: Status | "all") => (k === "all" ? all.length : all.filter((s) => s.status === k).length);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">학교별 점검표</h1>
-        <button onClick={async () => { await fetch("/api/admin/login", { method: "DELETE" }); location.reload(); }} className="text-xs text-zinc-500">
+    <div className="flex flex-col gap-5">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold">학교별 점검표</h1>
+          <p className="text-sm text-muted mt-1">AI가 정리한 신고를 확인해 확정하면 학부모 지도에 표시됩니다. 위험 여부 판단과 현장 확인은 담당자가 합니다.</p>
+        </div>
+        <button type="button" onClick={async () => { await fetch("/api/admin/login", { method: "DELETE" }); location.reload(); }} className="h-9 px-3 rounded-lg border border-line bg-white text-sm text-muted hover:text-ink">
           나가기
         </button>
       </div>
-      <div className="grid grid-cols-3 gap-2 text-center text-sm">
-        <Kpi n={medianLead == null ? "—" : `${medianLead < 1 ? "<1" : Math.round(medianLead)}h`} label="신고→첫 조치 중앙값" />
-        <Kpi n={`${resolvedRate}%`} label="처리 완료율" />
-        <Kpi n={String(all.filter((s) => s.status === "ai_proposed").length)} label="대기 중" />
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Kpi n={String(waiting)} label="확인 대기" hint="AI 제안 + 직접 검토" accent={waiting > 0 ? "text-priority-ink" : ""} />
+        <Kpi n={String(inProgress)} label="처리 중" hint="기관에 전달됨" accent="text-progress-ink" />
+        <Kpi n={String(resolvedThisMonth)} label="이달 고쳐짐" hint={`${Number(month.slice(5))}월`} accent="text-done-ink" />
+        <Kpi n={leadLabel} label="신고 → 첫 조치" hint="중앙값" />
       </div>
 
-      <div className="flex gap-1 flex-wrap text-xs">
-        {TABS.map((t) => (
-          <button key={t.key} onClick={() => setTab(t.key)} className={`px-3 py-1.5 rounded-full border ${tab === t.key ? "bg-zinc-900 text-white border-zinc-900" : "bg-white"}`}>
-            {t.label}
-            <span className="ml-1 opacity-60">{t.key === "all" ? all.length : all.filter((s) => s.status === t.key).length}</span>
-          </button>
-        ))}
+      <div className="bg-white border border-line rounded-xl p-3 flex flex-col gap-3">
+        <div className="flex gap-1 flex-wrap">
+          {TABS.map((t) => (
+            <button key={t.key} type="button" onClick={() => setTab(t.key)} className={`h-9 px-3 rounded-lg text-sm font-medium flex items-center gap-1.5 ${tab === t.key ? "bg-ink text-white" : "bg-ground text-ink hover:bg-ground-deep"}`}>
+              {t.label}
+              <span className={`text-xs ${tab === t.key ? "text-white/70" : "text-muted"}`}>{count(t.key)}</span>
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2 flex-wrap items-center">
+          <select value={schoolFilter} onChange={(e) => setSchoolFilter(e.target.value)} className="h-9 rounded-lg border border-line bg-white px-2.5 text-sm min-w-[180px]">
+            <option value="">모든 학교</option>
+            {schools.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+          <label className="relative flex-1 min-w-[200px]">
+            <span className="sr-only">신고 내용 검색</span>
+            <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="내용·요약·학교·종류 검색" className="h-9 w-full rounded-lg border border-line bg-white pl-8 pr-3 text-sm outline-none focus:border-brand" />
+          </label>
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-xs text-muted">월간 리포트</span>
+            <select value={reportSchool} onChange={(e) => setReportSchool(e.target.value)} className="h-9 rounded-lg border border-line bg-white px-2.5 text-sm max-w-[200px]">
+              {schools.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+            <button type="button" onClick={generateReport} className="h-9 px-3 rounded-lg bg-brand text-white text-sm font-bold hover:bg-brand-dark">생성</button>
+          </div>
+        </div>
+        {reportMsg && <div className="text-xs text-progress-ink">{reportMsg}</div>}
       </div>
 
-      <div className="text-xs text-zinc-500 flex gap-2 items-center flex-wrap">
-        월간 리포트 생성(시연):
-        {schools.map((s) => (
-          <button key={s.id} onClick={() => generateReport(s.id)} className="underline">
-            {s.name}
-          </button>
-        ))}
-        {reportMsg && <span className="text-blue-700">{reportMsg}</span>}
-      </div>
+      {!loaded && <div className="h-40 rounded-xl bg-white border border-line animate-pulse" />}
+      {loaded && rows.length === 0 && (
+        <div className="bg-white border border-line rounded-xl p-10 flex flex-col items-center text-center gap-2">
+          <Mascot size={56} mood="progress" />
+          <div className="font-bold">이 조건의 신고가 없어요</div>
+          <p className="text-sm text-muted">탭이나 학교 필터를 바꿔 보세요.</p>
+        </div>
+      )}
 
-      <ul className="space-y-3">
-        {rows.length === 0 && <li className="text-sm text-zinc-500">해당 상태의 신호가 없습니다.</li>}
+      <ul className="flex flex-col gap-3">
         {rows.map((s) => (
-          <li key={s.id} className="bg-white rounded-xl border border-zinc-200 p-4 text-sm space-y-2">
-            <div className="flex justify-between text-xs text-zinc-500 gap-2">
-              <span className="flex items-center gap-2 flex-wrap">
-                {s.receivedAt ? new Date(s.receivedAt).toLocaleString("ko-KR") : ""} · 위치 확신 {s.locationConfidence}
-                {s.locationConfidence === "low" && (
-                  <span className="rounded-full bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 font-medium">위치 확인 필요</span>
-                )}
-              </span>
-              <span className="rounded px-1.5 bg-zinc-100 self-start">{s.status}</span>
+          <li key={s.id} className="bg-white border border-line rounded-xl">
+            <div className="px-5 py-3 border-b border-line flex items-center gap-3 flex-wrap text-xs text-muted">
+              <span className={`h-6 px-2 rounded-md text-xs font-bold inline-flex items-center ${STATUS_PILL[s.status].cls}`}>{STATUS_PILL[s.status].label}</span>
+              <span>{s.receivedAt ? new Date(s.receivedAt).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) : ""}</span>
+              <span className="font-medium text-ink">{s.schoolName ?? "학교 미정"}</span>
+              <span>위치 확신 <b className={s.locationConfidence === "high" ? "text-done-ink" : s.locationConfidence === "mid" ? "text-ink" : "text-priority-ink"}>{s.locationConfidence}</b></span>
+              {s.locationConfidence === "low" && <span className="h-6 px-2 rounded-md bg-priority-soft text-priority-ink font-bold inline-flex items-center">위치 확인 필요</span>}
+              <span className="ml-auto font-mono text-[11px] text-faint">{s.id.slice(0, 8)}</span>
             </div>
-            <div className="flex gap-3">
-              {s.hasPhoto && <Photo reportId={s.reportId} />}
-              <blockquote className="border-l-2 pl-3 text-zinc-700 whitespace-pre-wrap flex-1">{s.maskedText}</blockquote>
-            </div>
-            {s.rawAddress && <div className="text-xs text-zinc-500">주소: {s.rawAddress}</div>}
-            <div className="text-zinc-800">
-              <span className="font-medium">AI 요약</span> {s.aiSummary}
-              <div className="text-xs text-zinc-500 mt-0.5">{s.aiReason}</div>
-              {s.legalBasis && <div className="text-xs text-zinc-500">근거: {s.legalBasis}</div>}
-            </div>
-            <LocationFix signal={s} schools={schools} busy={busy === s.id} onSave={(p) => patch(s.id, p)} />
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <select defaultValue={s.schoolId ?? ""} onChange={(e) => patch(s.id, { schoolId: e.target.value || null })} className="border rounded-lg px-2 py-1 text-xs">
-                <option value="">학교 미정</option>
-                {schools.map((x) => (
-                  <option key={x.id} value={x.id}>{x.name}</option>
-                ))}
-              </select>
-              <select defaultValue={s.category} onChange={(e) => patch(s.id, { category: e.target.value })} className="border rounded-lg px-2 py-1 text-xs">
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-              <select defaultValue={s.agencyId ?? ""} onChange={(e) => patch(s.id, { agencyId: e.target.value || null })} className="border rounded-lg px-2 py-1 text-xs">
-                <option value="">기관 미정</option>
-                {agencies.map((a) => (
-                  <option key={a.id} value={a.id}>{a.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              {(s.status === "ai_proposed" || s.status === "received") && (
-                <Btn onClick={() => patch(s.id, { action: "confirm" })} busy={busy === s.id} primary>확정 (지도에 표시)</Btn>
-              )}
-              {s.status === "confirmed" && <Btn onClick={() => patch(s.id, { action: "resolve" })} busy={busy === s.id} primary>고쳐짐 처리</Btn>}
-              {s.status !== "dismissed" && s.status !== "resolved" && (
-                <Btn onClick={() => patch(s.id, { action: "dismiss" })} busy={busy === s.id}>해당 없음</Btn>
-              )}
+
+            <div className="p-5 grid gap-5 lg:grid-cols-[auto_minmax(0,1fr)_280px]">
+              <div className="w-28 shrink-0">
+                {s.hasPhoto ? <Photo reportId={s.reportId} /> : <div className="w-28 h-28 rounded-lg bg-ground border border-line flex items-center justify-center text-faint text-xs">사진 없음</div>}
+              </div>
+
+              <div className="flex flex-col gap-3 min-w-0">
+                <blockquote className="text-[15px] leading-relaxed border-l-2 border-line-strong pl-3 whitespace-pre-wrap">{s.maskedText}</blockquote>
+                {s.rawAddress && <div className="text-xs text-muted">신고자 주소: {s.rawAddress}</div>}
+                <div className="rounded-lg bg-ground px-3.5 py-3 text-sm flex flex-col gap-1.5">
+                  <div><span className="text-xs font-bold text-brand-dark mr-2">AI 요약</span>{s.aiSummary}</div>
+                  <div className="text-xs text-muted leading-relaxed">{s.aiReason}</div>
+                  {s.legalBasis && <div className="text-xs text-muted">근거 · {s.legalBasis}</div>}
+                </div>
+                <LocationFix signal={s} schools={schools} busy={busy === s.id} onSave={(p) => patch(s.id, p)} />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Field label="학교">
+                  <select defaultValue={s.schoolId ?? ""} onChange={(e) => patch(s.id, { schoolId: e.target.value || null })} className="h-9 w-full rounded-lg border border-line bg-white px-2 text-sm">
+                    <option value="">학교 미정</option>
+                    {schools.map((x) => (
+                      <option key={x.id} value={x.id}>{x.name}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="종류">
+                  <select defaultValue={s.category} onChange={(e) => patch(s.id, { category: e.target.value })} className="h-9 w-full rounded-lg border border-line bg-white px-2 text-sm">
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="담당 기관">
+                  <select defaultValue={s.agencyId ?? ""} onChange={(e) => patch(s.id, { agencyId: e.target.value || null })} className="h-9 w-full rounded-lg border border-line bg-white px-2 text-sm">
+                    <option value="">기관 미정</option>
+                    {agencies.map((a) => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
+                  </select>
+                </Field>
+                <div className="flex flex-col gap-2 pt-1">
+                  {(s.status === "ai_proposed" || s.status === "received") && (
+                    <Btn onClick={() => patch(s.id, { action: "confirm" })} busy={busy === s.id} primary>확정 — 지도에 표시</Btn>
+                  )}
+                  {s.status === "confirmed" && <Btn onClick={() => patch(s.id, { action: "resolve" })} busy={busy === s.id} primary tone="done">고쳐짐 처리</Btn>}
+                  {s.status !== "dismissed" && s.status !== "resolved" && <Btn onClick={() => patch(s.id, { action: "dismiss" })} busy={busy === s.id}>해당 없음</Btn>}
+                  {(s.status === "dismissed" || s.status === "resolved") && <Btn onClick={() => patch(s.id, { action: "confirm" })} busy={busy === s.id}>다시 처리 중으로</Btn>}
+                </div>
+              </div>
             </div>
           </li>
         ))}
@@ -152,46 +222,31 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
   );
 }
 
-/**
- * 좌표 보정: 작은 지도를 펼쳐 클릭으로 위치를 찍고 PATCH { lat, lng } 로 저장한다.
- * 저장되면 서버가 locationConfidence 를 high 로 올린다.
- * 지도는 펼쳤을 때만 그린다(카드가 많을 때 Leaflet 인스턴스 폭증 방지).
- */
+/** 좌표 보정: 작은 지도를 펼쳐 클릭으로 위치를 찍고 PATCH { lat, lng } 로 저장한다. low 는 자동으로 펼친다. */
 function LocationFix({ signal: s, schools, busy, onSave }: { signal: Row; schools: School[]; busy: boolean; onSave: (p: { lat: number; lng: number }) => void }) {
   const [open, setOpen] = useState(s.locationConfidence === "low");
   const [picked, setPicked] = useState<{ lat: number; lng: number } | null>(s.lat != null && s.lng != null ? { lat: s.lat, lng: s.lng } : null);
   const school = schools.find((x) => x.id === s.schoolId);
-  const center = s.lat != null && s.lng != null
-    ? { lat: s.lat, lng: s.lng, name: school?.name ?? "신고 위치" }
-    : school
-      ? { lat: school.lat, lng: school.lng, name: school.name }
-      : { ...YANGJU_CENTER, name: "양주시" };
+  const center = s.lat != null && s.lng != null ? { lat: s.lat, lng: s.lng, name: school?.name ?? "신고 위치" } : school ? { lat: school.lat, lng: school.lng, name: school.name } : { ...YANGJU_CENTER, name: "양주시" };
   const moved = picked && (picked.lat !== s.lat || picked.lng !== s.lng);
   return (
-    <div className="text-xs space-y-1">
-      <div className="flex items-center gap-2 flex-wrap">
-        <button type="button" onClick={() => setOpen((v) => !v)} className="underline text-zinc-600">
+    <div className="text-xs flex flex-col gap-1.5">
+      <div className="flex items-center gap-3 flex-wrap">
+        <button type="button" onClick={() => setOpen((v) => !v)} className="text-brand-dark font-medium underline-offset-2 hover:underline">
           {open ? "지도 접기" : "지도에서 위치 보정"}
         </button>
-        <span className="text-zinc-500">
-          {s.lat != null && s.lng != null ? `현재 ${s.lat.toFixed(5)}, ${s.lng.toFixed(5)}` : "좌표 없음 — 지도에서 찍어 주세요"}
-        </span>
+        <span className="text-muted">{s.lat != null && s.lng != null ? `${s.lat.toFixed(5)}, ${s.lng.toFixed(5)}` : "좌표 없음 — 지도에서 찍어 주세요"}</span>
         {moved && (
           <>
-            <button type="button" disabled={busy} onClick={() => onSave(picked!)} className="rounded-lg px-2 py-1 border bg-amber-500 text-white border-amber-500 disabled:opacity-50">
-              이 위치로 저장
-            </button>
-            <button type="button" onClick={() => setPicked(s.lat != null && s.lng != null ? { lat: s.lat, lng: s.lng } : null)} className="text-zinc-500 underline">
-              되돌리기
-            </button>
+            <button type="button" disabled={busy} onClick={() => onSave(picked!)} className="h-7 px-2.5 rounded-md bg-priority text-white font-bold disabled:opacity-50">이 위치로 저장</button>
+            <button type="button" onClick={() => setPicked(s.lat != null && s.lng != null ? { lat: s.lat, lng: s.lng } : null)} className="text-muted underline">되돌리기</button>
           </>
         )}
       </div>
       {open && (
-        <>
-          <SchoolMap center={center} radiusM={300} onPick={setPicked} picked={picked} height={220} />
-          <div className="text-zinc-500">지도를 클릭하면 빨간 점이 옮겨집니다. 저장하면 학부모 지도에 그 위치로 표시됩니다.</div>
-        </>
+        <div className="rounded-lg overflow-hidden border border-line">
+          <SchoolMap center={center} radiusM={300} onPick={setPicked} picked={picked} height={240} />
+        </div>
       )}
     </div>
   );
@@ -203,12 +258,12 @@ function Photo({ reportId }: { reportId: string }) {
   const src = `/api/admin/reports/${reportId}/photo`;
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="shrink-0 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100 w-24 h-24" title="사진 크게 보기">
+      <button type="button" onClick={() => setOpen(true)} className="w-28 h-28 rounded-lg overflow-hidden border border-line bg-ground block" title="사진 크게 보기">
         {/* eslint-disable-next-line @next/next/no-img-element -- 인증 쿠키가 필요한 내부 API 이미지 */}
         <img src={src} alt="접수 사진" className="w-full h-full object-cover" loading="lazy" />
       </button>
       {open && (
-        <div onClick={() => setOpen(false)} className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 cursor-zoom-out">
+        <div onClick={() => setOpen(false)} className="fixed inset-0 z-50 bg-ink/80 flex items-center justify-center p-6 cursor-zoom-out">
           {/* eslint-disable-next-line @next/next/no-img-element -- 인증 쿠키가 필요한 내부 API 이미지 */}
           <img src={src} alt="접수 사진 크게 보기" className="max-h-full max-w-full rounded-lg shadow-xl" />
         </div>
@@ -217,17 +272,29 @@ function Photo({ reportId }: { reportId: string }) {
   );
 }
 
-function Kpi({ n, label }: { n: string; label: string }) {
+function Kpi({ n, label, hint, accent }: { n: string; label: string; hint?: string; accent?: string }) {
   return (
-    <div className="bg-white rounded-lg border border-zinc-200 py-2">
-      <div className="text-xl font-semibold">{n}</div>
-      <div className="text-xs text-zinc-500">{label}</div>
+    <div className="bg-white border border-line rounded-xl px-4 py-3.5">
+      <div className="text-xs text-muted">{label}</div>
+      <div className={`text-2xl font-bold mt-0.5 ${accent ?? ""}`}>{n}</div>
+      {hint && <div className="text-[11px] text-faint mt-0.5">{hint}</div>}
     </div>
   );
 }
-function Btn({ children, onClick, busy, primary }: { children: React.ReactNode; onClick: () => void; busy?: boolean; primary?: boolean }) {
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} disabled={busy} className={`rounded-lg px-3 py-1.5 text-xs border ${primary ? "bg-blue-600 text-white border-blue-600" : "bg-white"} disabled:opacity-50`}>
+    <label className="flex flex-col gap-1">
+      <span className="text-[11px] text-muted">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function Btn({ children, onClick, busy, primary, tone }: { children: React.ReactNode; onClick: () => void; busy?: boolean; primary?: boolean; tone?: "done" }) {
+  const cls = primary ? (tone === "done" ? "bg-done text-white hover:opacity-90" : "bg-brand text-white hover:bg-brand-dark") : "bg-white border border-line text-ink hover:bg-ground";
+  return (
+    <button type="button" onClick={onClick} disabled={busy} className={`h-10 rounded-lg px-3 text-sm font-bold disabled:opacity-50 ${cls}`}>
       {children}
     </button>
   );

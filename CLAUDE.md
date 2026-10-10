@@ -16,10 +16,11 @@
 
 ## 화면 구조·디자인 (2026-10-10 개편, 시안: docs/design 캔버스)
 - 학부모 화면은 모바일 폭(최대 430px) + 하단 탭 3개(홈 `/`, 지도 `/schools`→기억된 학교, 내 신고 `/my`). 공무원 `/admin`은 넓은 폭. 틀은 components/AppShell.tsx.
-- 색은 의미로만: 브랜드 초록 #1F8A5B(주요 버튼·활성 탭·고쳐짐), 주황 #E8731A(점검 우선), 파랑 #2F6FE4(처리 중), 회색(검토 중), 바탕 민트 #EEF5F1. 토큰은 app/globals.css `@theme`(bg-brand, text-muted, border-line …). 서체 Noto Sans KR.
+- 색은 의미로만(키 컬러는 센디 자료 톤, 10/10): 브랜드 파랑 #006EF4(주요 버튼·활성 탭·처리 중), 네이비 글자 #1F2D3A, 바탕 회청 #F6F8FB, 주황 #C2410C(점검 우선), 초록 #0F7B4F(고쳐짐, done 토큰), 회색(검토 중). 토큰은 app/globals.css `@theme`(bg-brand, text-muted, border-line, bg-done …). 서체 Noto Sans KR. 모서리 12~16px, 흰 카드는 1px 선, 버튼 그림자 없음.
 - 신고는 3단계 한 컴포넌트(app/report/ReportForm.tsx): 사진 → 한 줄(표현 칩) → 위치·보내기. 종류 선택 없음. 신고 중에는 하단 탭 숨김.
 - 기기 저장(lib/local.ts, localStorage): 고른 학교 `tm_school`, 내 신고 토큰 `tm_reports`. 로그인 없음. 진행 확인 페이지를 열면 그 신고도 기기에 기억.
 - 캐릭터 "핀이"(components/Mascot.tsx)는 빈 상태·안내에만. 데이터 위에 올리지 않는다.
+- 공무원 /admin(데스크톱 기준, 최대 1152px): 지표 4개(확인 대기·처리 중·이달 고쳐짐·신고→첫 조치 중앙값) → 도구 줄(상태 탭+건수, 학교 필터, 검색, 월간 리포트 생성) → 카드(사진 | 신고 글·AI 요약·이유·근거·좌표 보정 | 학교·종류·기관 선택 + 확정/고쳐짐/해당 없음). 쓰기는 PATCH /api/admin/signals/:id 하나.
 
 ## 저장소
 - SUPABASE_URL 없으면 data/db.json 파일 저장소(로컬 시연용). Vercel 배포 시 Supabase 필수(supabase/schema.sql: report, signal, monthly_report). 월간 리포트도 store 를 통해 저장(파일 or 테이블). 배포 절차는 docs/deploy.md.
@@ -36,7 +37,7 @@ npm run dev / npm run load-data / npm run load-accidents / npm run seed (모의 
 2. ~~Claude 호출 실제 테스트~~ 완료 10/7: 모의 12건 v1 = 종류 11/12·기관 11/12·학교 11/11 → prompts/v2.ts(규칙 3-1 보행 장애물→인도·도로 파손) = 12/12·12/12·11/11, PII 누출 0. lib/ai.ts 는 v2 사용. 종류 정의·기관 표는 안 바꿈
 3. ~~/admin 좌표 보정 UI~~ 완료 10/6: 카드의 "지도에서 위치 보정" → 클릭 → "이 위치로 저장"(PATCH lat/lng → confidence high). low 는 "위치 확인 필요" 배지 + 지도 자동 펼침
 4. ~~사고다발지역 레이어~~ 완료 10/6: scripts/load-accidents.ts(DATA_GO_KR_KEY) → data/accidents.json → /api/schools/:id/signals.accidents → 지도 붉은 점선 원. 0건이면 "아직 사고 지도에 없습니다 — 신고가 첫 신호입니다". 10/7 실제 적재: 2020~2024 양주시 1건(2023 옥정동 옥빛초 부근, 사고 2·사상자 2). 스크립트는 .env.local 을 직접 읽음
-5. ~~모바일 화면 다듬기~~ 10/10 시안대로 학부모 화면 전면 개편 완료(홈·신고 3단계·지도 탭·내 신고·진행 확인·월간 리포트). 남은 것: 시연 대본대로 리허설, 공무원 화면 모바일 대응
+5. ~~모바일 화면 다듬기~~ 10/10 시안대로 학부모 화면 전면 개편 완료(홈·신고 3단계·지도 탭·내 신고·진행 확인·월간 리포트). 남은 것: 시연 대본대로 리허설 (공무원 데스크톱 화면도 10/10 개편 완료)
 
 ## 환경 (Mac) — 어기면 전부 막힘
 - 시스템 Node 14 금지. nvm Node 22 (`.nvmrc`). `~/.zshenv` 가 nvm 을 로드하므로 zsh 라면 어디서나 v22. bash -lc 는 아직 v14.

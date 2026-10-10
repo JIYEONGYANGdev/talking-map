@@ -14,16 +14,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen flex flex-col">
         <header className="bg-white border-b border-line">
-          <div className="mx-auto max-w-3xl px-4 py-3 flex items-center justify-between">
-            <Link href="/" className="font-bold">
-              말하는 지도 <span className="text-muted font-normal text-sm">공무원 점검표</span>
+          <div className="mx-auto max-w-6xl px-6 h-14 flex items-center justify-between">
+            <Link href="/admin" className="font-bold flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-brand" aria-hidden="true" />
+              말하는 지도 <span className="text-muted font-normal text-sm">공무원</span>
             </Link>
-            <Link href="/" className="text-sm text-muted">
-              학부모 화면
+            <Link href="/" className="text-sm text-muted hover:text-ink">
+              학부모 화면 보기
             </Link>
           </div>
         </header>
-        <main className="flex-1 mx-auto w-full max-w-3xl px-4 py-4">{children}</main>
+        <main className="flex-1 mx-auto w-full max-w-6xl px-6 py-6">{children}</main>
       </div>
     );
   }
