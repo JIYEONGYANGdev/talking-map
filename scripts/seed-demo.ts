@@ -20,7 +20,7 @@ import type { School } from "../lib/types";
 
 for (const f of [".env.local", ".env"]) if (existsSync(f)) { try { process.loadEnvFile(f); } catch {} }
 
-const BASE = process.env.BASE ?? "http://localhost:3000";
+const BASE = process.env.BASE ?? "http://127.0.0.1:3000";
 const PW = process.env.ADMIN_PASSWORD ?? "yangju2026";
 const DEMO_ID = "demo-yeonpurun";
 const DEMO_NAME = "연푸룬초등학교(시연)";

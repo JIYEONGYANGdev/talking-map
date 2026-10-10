@@ -6,7 +6,8 @@
  */
 import { readFileSync, writeFileSync } from "fs";
 
-const BASE = process.env.BASE ?? "http://localhost:3000";
+// localhost 는 Node fetch 가 ::1 을 먼저 시도해 느려질 수 있어 127.0.0.1 을 기본으로 둔다
+const BASE = process.env.BASE ?? "http://127.0.0.1:3000";
 const file = process.argv[2] ?? "data/mock-reports.json";
 type Mock = { text: string; address?: string; lat?: number; lng?: number; label?: { category: string; agencyId: string; schoolId?: string } };
 const mocks: Mock[] = JSON.parse(readFileSync(file, "utf8"));
@@ -33,7 +34,8 @@ const mocks: Mock[] = JSON.parse(readFileSync(file, "utf8"));
     for (const m of mocks) {
       if (!m.label) continue;
       labeled++;
-      const rep = db.reports.find((x: { rawText: string }) => x.rawText === m.text);
+      // 같은 글이 여러 번 투입됐으면 가장 최근 것(이번 실행)을 본다
+      const rep = [...db.reports].reverse().find((x: { rawText: string }) => x.rawText === m.text);
       const sig = db.signals.find((x: { reportId: string }) => x.reportId === rep?.id);
       if (!sig) continue;
       if (sig.category === m.label.category) okCat++;
