@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Mascot from "@/components/Mascot";
 import SchoolPicker from "@/components/SchoolPicker";
 import { useMyReports, useSchoolId } from "@/lib/local";
@@ -11,6 +12,12 @@ type Summary = { signals: { kind: "priority" | "inprogress" | "resolved" }[]; re
 export default function Home({ schools }: { schools: School[] }) {
   const [schoolId, setSchoolId, ready] = useSchoolId();
   const [picking, setPicking] = useState(false);
+  // /?school=<id> 로 열면 그 학교를 기억하고 바로 대시보드를 보여준다 (공유 링크, 디자인 도구 가져오기용)
+  const params = useSearchParams();
+  const paramSchool = params.get("school");
+  useEffect(() => {
+    if (ready && paramSchool && paramSchool !== schoolId && schools.some((s) => s.id === paramSchool)) setSchoolId(paramSchool);
+  }, [ready, paramSchool, schoolId, schools, setSchoolId]);
   const [sum, setSum] = useState<Summary | null>(null);
   const [myReports] = useMyReports();
   const school = schools.find((s) => s.id === schoolId) ?? null;
