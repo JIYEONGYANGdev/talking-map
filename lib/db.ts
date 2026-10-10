@@ -47,6 +47,8 @@ export type MonthlyReport = {
 export type PhotoMediaType = "image/jpeg" | "image/png" | "image/webp";
 
 export interface Store {
+  /** 시연 데이터 초기화: 신고·신호·월간 리포트를 모두 지운다 (사진 파일은 남겨도 무해). 공무원 인증 뒤에만 호출. */
+  clearAll(): Promise<{ reports: number; signals: number }>;
   /** 공무원 열람용 사진 저장. 돌려주는 값은 report.photoUrl 에 넣는 내부 경로(공개 URL 아님). */
   savePhoto(reportId: string, data: Buffer, mediaType: PhotoMediaType): Promise<string>;
   getPhoto(photoUrl: string): Promise<{ data: Buffer; mediaType: PhotoMediaType } | null>;
@@ -86,6 +88,13 @@ const MT_BY_EXT: Record<string, PhotoMediaType> = { jpg: "image/jpeg", png: "ima
 const safePhotoName = (photoUrl: string) => path.basename(photoUrl).replace(/[^a-zA-Z0-9._-]/g, "");
 
 const fileStore: Store = {
+  async clearAll() {
+    const db = await loadFile();
+    const n = { reports: db.reports.length, signals: db.signals.length };
+    await saveFile({ reports: [], signals: [] });
+    await fs.rm(REPORTS_DIR, { recursive: true, force: true });
+    return n;
+  },
   async savePhoto(reportId, data, mediaType) {
     await fs.mkdir(PHOTOS_DIR, { recursive: true });
     const name = `${reportId}.${EXT[mediaType]}`;
@@ -164,6 +173,17 @@ const fromRow = <T>(o: Record<string, unknown> | null): T | null =>
 const PHOTO_BUCKET = "photos"; // 비공개 버킷. 서비스 키로만 읽고 쓴다.
 
 const supabaseStore: Store = {
+  async clearAll() {
+    const c = supa();
+    const { count: signals } = await c.from("signal").select("*", { count: "exact", head: true });
+    const { count: reports } = await c.from("report").select("*", { count: "exact", head: true });
+    // signal 이 report 를 참조하므로 순서대로. neq 조건은 "전체 삭제" 를 허용하기 위한 관용구.
+    for (const t of ["signal", "report", "monthly_report"]) {
+      const { error } = await c.from(t).delete().neq(t === "monthly_report" ? "month" : "id", "");
+      if (error) throw error;
+    }
+    return { reports: reports ?? 0, signals: signals ?? 0 };
+  },
   async savePhoto(reportId, data, mediaType) {
     const name = `${reportId}.${EXT[mediaType]}`;
     const upload = () => supa().storage.from(PHOTO_BUCKET).upload(name, data, { contentType: mediaType, upsert: true });
