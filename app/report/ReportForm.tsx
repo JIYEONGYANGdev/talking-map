@@ -93,14 +93,15 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
               <h1 className="text-[22px] font-bold leading-snug">무엇을 보셨나요?<br />사진 한 장이면 돼요</h1>
               <p className="text-sm text-muted mt-1.5 leading-relaxed">종류를 고를 필요 없어요. AI가 정리하고 공무원이 확인합니다.</p>
             </div>
-            <input ref={fileRef} id="report-photo" type="file" accept="image/*" capture="environment" className="sr-only" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} />
+            {/* capture 를 주지 않아야 iOS 사파리가 "사진 보관함 / 사진 찍기 / 파일 선택" 을 고르게 한다 (capture="environment" 는 카메라만 연다) */}
+            <input ref={fileRef} id="report-photo" type="file" accept="image/*" className="sr-only" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} />
             {!photo ? (
               <label htmlFor="report-photo" className="h-[300px] rounded-2xl border-2 border-dashed border-line-strong bg-white flex flex-col items-center justify-center gap-3 cursor-pointer active:bg-ground-deep">
                 <div className="w-[72px] h-[72px] rounded-full bg-ground-deep flex items-center justify-center text-brand">
                   <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" /><circle cx="12" cy="13" r="3.5" /></svg>
                 </div>
                 <div className="text-[17px] font-bold">사진 찍기</div>
-                <div className="text-[13px] text-muted">또는 앨범에서 올리기</div>
+                <div className="text-[13px] text-muted">촬영하거나 사진 보관함·파일에서 골라요</div>
               </label>
             ) : (
               <div className="rounded-2xl overflow-hidden bg-white border border-line">
