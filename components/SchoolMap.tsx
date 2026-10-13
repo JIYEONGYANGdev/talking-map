@@ -116,7 +116,11 @@ export default function SchoolMap({ center, radiusM = 500, signals = [], zones =
         .bindPopup(`<b>${MARKER_LABEL[s.kind]}</b> · ${s.category}<br/>${s.summary}`)
         .addTo(g);
       // 점을 누르면 그 위치를 화면 가운데로 (말풍선은 Leaflet 이 기본으로 연다)
-      m.on("click", () => map.current?.panTo([s.lat!, s.lng!], { animate: true }));
+      m.on("click", () => {
+        map.current?.closePopup();
+        map.current?.panTo([s.lat!, s.lng!], { animate: true });
+        m.openPopup();
+      });
       markers.current.set(`signal:${s.id}`, m);
     });
     // center 는 부모가 매 렌더마다 새 객체로 만들 수 있으므로 값으로 비교한다 (안 그러면 지도를 움직일 때마다 마커가 다시 그려져 말풍선이 닫힌다)
@@ -126,6 +130,7 @@ export default function SchoolMap({ center, radiusM = 500, signals = [], zones =
   useEffect(() => {
     const mp = map.current;
     if (!mp || !focus) return;
+    mp.closePopup(); // 말풍선은 한 번에 하나만. 이동 전에 열려 있던 것을 닫는다
     const zoom = focus.zoom ?? Math.max(mp.getZoom(), 17);
     mp.flyTo([focus.lat, focus.lng], zoom, { duration: 0.6 });
     const open = () => {
