@@ -31,11 +31,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const tab = pathname === "/" ? "home" : pathname.startsWith("/schools") ? "map" : pathname.startsWith("/my") || pathname.startsWith("/reports") ? "my" : "none";
   const hideTab = pathname.startsWith("/report") && !pathname.startsWith("/reports"); // 신고 중에는 탭을 숨겨 한 가지 일에 집중
+  const isMapPage = /^\/schools\/[^/]+$/.test(pathname); // 지도 페이지는 화면 높이에 고정 (바텀시트 안에서만 스크롤)
 
   return (
     <div className="min-h-screen flex justify-center">
       <div className="w-full max-w-[430px] min-h-screen flex flex-col bg-ground">
-        <main className={`flex-1 flex flex-col ${hideTab ? "" : "pb-24"}`}>{children}</main>
+        <main className={`flex-1 flex flex-col ${hideTab ? "" : isMapPage ? "pb-[84px]" : "pb-24"}`}>{children}</main>
         {!hideTab && <BottomTab active={tab} />}
       </div>
     </div>

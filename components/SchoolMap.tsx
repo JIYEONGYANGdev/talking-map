@@ -25,7 +25,7 @@ type Props = {
   /** 신고 폼: 탭한 위치를 돌려준다 */
   onPick?: (p: { lat: number; lng: number }) => void;
   picked?: { lat: number; lng: number } | null;
-  height?: number;
+  height?: number | string;
   /** 확대·축소 버튼 위치. 지도 위에 칩을 올리는 화면은 오른쪽 아래가 안 가린다 */
   zoomPosition?: L.ControlPosition;
 };

@@ -40,12 +40,13 @@ export default function SchoolMapClient({ school, schools }: { school: School; s
   const month = new Date().toISOString().slice(0, 7);
 
   return (
-    <div className="flex flex-col">
-      <div className="relative">
+    // 화면 높이(탭 84px 제외)에 고정: 지도가 남는 영역을 채우고, 아래 시트는 자기 안에서만 스크롤된다
+    <div className="flex flex-col overflow-hidden" style={{ height: "calc(100dvh - 84px)" }}>
+      <div className="relative flex-1 min-h-0">
         {data ? (
-          <SchoolMap center={{ lat: school.lat, lng: school.lng, name: school.name }} radiusM={data.radiusM} signals={data.signals} zones={data.zones} accidents={data.accidents ?? []} height={440} />
+          <SchoolMap center={{ lat: school.lat, lng: school.lng, name: school.name }} radiusM={data.radiusM} signals={data.signals} zones={data.zones} accidents={data.accidents ?? []} height="100%" />
         ) : (
-          <div className="h-[440px] bg-ground-deep animate-pulse" />
+          <div className="h-full bg-ground-deep animate-pulse" />
         )}
 
         <div className="absolute left-4 right-4 top-4 flex items-center justify-between pointer-events-none" style={{ zIndex: 1000 }}>
@@ -73,8 +74,8 @@ export default function SchoolMapClient({ school, schools }: { school: School; s
         </div>
       </div>
 
-      <div className="relative -mt-6 bg-white rounded-t-[24px] shadow-[0_-6px_20px_rgba(0,0,0,0.08)] px-5 pt-2.5 pb-4 flex flex-col gap-3" style={{ zIndex: 1001 }}>
-        <div className="w-10 h-1 rounded-full bg-line self-center" />
+      <div className="relative -mt-6 flex-none max-h-[52%] overflow-y-auto overscroll-contain bg-white rounded-t-2xl shadow-[0_-6px_20px_rgba(0,0,0,0.08)] px-5 pb-4 flex flex-col gap-3" style={{ zIndex: 1001 }}>
+        <div className="sticky top-0 bg-white pt-2.5 pb-1 flex justify-center" aria-hidden="true"><div className="w-10 h-1 rounded-full bg-line" /></div>
         <div className="flex items-baseline justify-between">
           <h1 className="font-bold text-[15px]">{school.name} 주변 신호 {data ? data.signals.length : "…"}건</h1>
           {data && data.reviewing > 0 && <span className="text-xs text-muted">검토 중 {data.reviewing}건은 미표시</span>}
