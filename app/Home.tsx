@@ -69,7 +69,7 @@ export default function Home({ schools }: { schools: School[] }) {
         <div className="text-xs text-muted">{school.district} · 양주시</div>
       </div>
 
-      <section className="bg-white border border-line rounded-2xl p-5 flex items-center gap-3.5">
+      <Link href={`/schools/${school.id}`} aria-label={`${school.name} 주변 지도 보기`} className="bg-white border border-line rounded-2xl p-5 flex items-center gap-3.5 active:bg-ground-deep">
         <Mascot size={64} mood={counts.priority > 0 ? "priority" : "default"} />
         <div className="flex flex-col gap-1.5">
           {noAccidents ? (
@@ -83,8 +83,9 @@ export default function Home({ schools }: { schools: School[] }) {
               <p className="text-[13px] text-muted leading-relaxed">도로교통공단 집계 {sum?.accidents.length}곳. 지도에서 붉은 점선 원으로 표시돼요.</p>
             </>
           )}
+          <span className="text-xs font-medium text-brand-dark">지도에서 보기 ›</span>
         </div>
-      </section>
+      </Link>
 
       <Link href={`/report?school=${school.id}`} className="h-[60px] rounded-xl bg-brand text-white font-bold text-[17px] flex items-center justify-center gap-2.5 shadow-sm active:bg-brand-dark">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" /><circle cx="12" cy="13" r="3.5" /></svg>
@@ -97,9 +98,9 @@ export default function Home({ schools }: { schools: School[] }) {
           <Link href={`/schools/${school.id}`} className="text-[13px] font-medium text-brand-dark">지도에서 보기</Link>
         </div>
         <div className="grid grid-cols-3 gap-2.5">
-          <Tile n={counts.priority} label="점검 우선" dot="bg-priority" ink="text-priority-ink" />
-          <Tile n={counts.inprogress} label="처리 중" dot="bg-progress" ink="text-progress-ink" />
-          <Tile n={counts.resolved} label="고쳐짐" dot="bg-done" ink="text-done-ink" />
+          <Tile n={counts.priority} label="점검 우선" dot="bg-priority" ink="text-priority-ink" href={`/schools/${school.id}`} />
+          <Tile n={counts.inprogress} label="처리 중" dot="bg-progress" ink="text-progress-ink" href={`/schools/${school.id}`} />
+          <Tile n={counts.resolved} label="고쳐짐" dot="bg-done" ink="text-done-ink" href={`/schools/${school.id}`} />
         </div>
         <p className="text-xs text-muted px-1">
           {sum ? (sum.reviewing > 0 ? `검토 중 ${sum.reviewing}건은 공무원이 확인한 뒤 지도에 표시돼요.` : "검토 중인 신고는 공무원이 확인한 뒤 지도에 표시돼요.") : "불러오는 중…"}
@@ -125,12 +126,12 @@ export default function Home({ schools }: { schools: School[] }) {
   );
 }
 
-function Tile({ n, label, dot, ink }: { n: number; label: string; dot: string; ink: string }) {
+function Tile({ n, label, dot, ink, href }: { n: number; label: string; dot: string; ink: string; href: string }) {
   return (
-    <div className="bg-white border border-line rounded-xl py-3.5 px-3 flex flex-col items-center gap-1">
+    <Link href={href} aria-label={`${label} ${n}건, 지도에서 보기`} className="bg-white border border-line rounded-xl py-3.5 px-3 flex flex-col items-center gap-1 active:bg-ground-deep">
       <div className={`w-2.5 h-2.5 rounded-full ${dot}`} />
       <div className={`text-[26px] font-bold leading-none ${ink}`}>{n}</div>
       <div className="text-xs text-muted">{label}</div>
-    </div>
+    </Link>
   );
 }
