@@ -29,6 +29,7 @@ export type School = {
   lng: number;
   address: string;
   district: "옥정" | "회천" | "기존시가지";
+  dong?: string; // 법정동·읍·면 (지번주소에서 추출, 예: 옥정동·백석읍·광적면)
   sample?: boolean; // 공공데이터 적재 전 임시값
 };
 

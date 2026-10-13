@@ -6,12 +6,26 @@ import type { School } from "@/lib/types";
 const DISTRICTS = ["전체", "옥정", "회천", "기존시가지"] as const;
 
 /** 첫 실행·학교 바꾸기: 권역 칩 + 검색 + 큰 버튼 목록 */
-export default function SchoolPicker({ schools, onPick, title = "우리 아이 학교를 골라 주세요", onClose }: { schools: School[]; onPick: (id: string) => void; title?: string; onClose?: () => void }) {
+export default function SchoolPicker({
+  schools,
+  onPick,
+  title = "우리 아이 학교를 골라 주세요",
+  onClose,
+  dong: initialDong,
+}: {
+  schools: School[];
+  onPick: (id: string) => void;
+  title?: string;
+  onClose?: () => void;
+  /** 동네 시트에서 고른 법정동·읍·면. 그 동네 학교만 먼저 보여주고, 칩의 ✕ 로 풀 수 있다 */
+  dong?: string;
+}) {
   const [q, setQ] = useState("");
   const [d, setD] = useState<(typeof DISTRICTS)[number]>("전체");
+  const [dong, setDong] = useState(initialDong);
   const list = useMemo(
-    () => schools.filter((s) => (d === "전체" || s.district === d) && (!q.trim() || s.name.includes(q.trim()))),
-    [schools, d, q],
+    () => schools.filter((s) => (d === "전체" || s.district === d) && (!dong || s.dong === dong) && (!q.trim() || s.name.includes(q.trim()))),
+    [schools, d, dong, q],
   );
   return (
     <div className="flex flex-col gap-4 px-5 pt-5 pb-8 min-h-screen">
@@ -19,7 +33,7 @@ export default function SchoolPicker({ schools, onPick, title = "우리 아이 �
         <Mascot size={56} />
         <div className="flex-1">
           <h1 className="text-xl font-bold leading-snug">{title}</h1>
-          <p className="text-sm text-muted">양주시 초등학교 {schools.length}곳. 나중에 바꿀 수 있어요.</p>
+          <p className="text-sm text-muted">{dong ? `${dong} 초등학교 ${list.length}곳` : `양주시 초등학교 ${schools.length}곳`}. 나중에 바꿀 수 있어요.</p>
         </div>
         {onClose && (
           <button type="button" onClick={onClose} aria-label="닫기" className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
@@ -33,6 +47,12 @@ export default function SchoolPicker({ schools, onPick, title = "우리 아이 �
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="학교 이름 검색" className="w-full h-12 rounded-2xl bg-white border border-line pl-11 pr-4 text-base outline-none focus:border-brand" />
       </label>
       <div className="flex gap-2 flex-wrap">
+        {dong && (
+          <button type="button" onClick={() => setDong(undefined)} aria-label={`${dong} 필터 해제`} className="h-9 pl-4 pr-3 rounded-full text-sm font-medium bg-brand text-white flex items-center gap-1.5">
+            {dong}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+          </button>
+        )}
         {DISTRICTS.map((x) => (
           <button key={x} type="button" onClick={() => setD(x)} className={`h-9 px-4 rounded-full text-sm font-medium border ${d === x ? "bg-ink text-white border-ink" : "bg-white border-line text-ink"}`}>
             {x}

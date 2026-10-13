@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Mascot from "@/components/Mascot";
+import RegionSheet from "@/components/RegionSheet";
 import SchoolPicker from "@/components/SchoolPicker";
 import { useMyReports, useSchoolId } from "@/lib/local";
 import type { School } from "@/lib/types";
@@ -12,6 +13,8 @@ type Summary = { signals: { kind: "priority" | "inprogress" | "resolved" }[]; re
 export default function Home({ schools }: { schools: School[] }) {
   const [schoolId, setSchoolId, ready] = useSchoolId();
   const [picking, setPicking] = useState(false);
+  const [pickDong, setPickDong] = useState<string | undefined>(undefined); // 동네 시트에서 고른 동네로 학교 고르기
+  const [region, setRegion] = useState(false); // 우측 상단 지역 표시 → 동네 시트
   // /?school=<id> 로 열면 그 학교를 기억하고 바로 대시보드를 보여준다 (공유 링크, 디자인 도구 가져오기용)
   const params = useSearchParams();
   const paramSchool = params.get("school");
@@ -41,13 +44,16 @@ export default function Home({ schools }: { schools: School[] }) {
   if (!school || picking) {
     return (
       <SchoolPicker
+        key={pickDong ?? ""}
         schools={schools}
+        dong={pickDong}
         onPick={(id) => {
           setSchoolId(id);
           setSum(null);
           setPicking(false);
+          setPickDong(undefined);
         }}
-        onClose={school ? () => setPicking(false) : undefined}
+        onClose={school ? () => { setPicking(false); setPickDong(undefined); } : undefined}
         title={school ? "학교 바꾸기" : undefined}
       />
     );
@@ -66,8 +72,23 @@ export default function Home({ schools }: { schools: School[] }) {
           {school.name}
           <svg className="text-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
         </button>
-        <div className="text-xs text-muted">{school.district} · 양주시</div>
+        <button type="button" onClick={() => setRegion(true)} aria-label="서비스 지역과 동네 보기" className="h-8 pl-2.5 pr-2 rounded-full text-xs text-muted flex items-center gap-0.5 active:bg-ground-deep">
+          {school.dong ?? school.district} · 양주시
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+        </button>
       </div>
+      {region && (
+        <RegionSheet
+          schools={schools}
+          current={school.dong}
+          onClose={() => setRegion(false)}
+          onPickDong={(dong) => {
+            setRegion(false);
+            setPickDong(dong);
+            setPicking(true);
+          }}
+        />
+      )}
 
       <Link href={`/schools/${school.id}`} aria-label={`${school.name} 주변 지도 보기`} className="bg-white border border-line rounded-2xl p-5 flex items-center gap-3.5 active:bg-ground-deep">
         <Mascot size={64} mood={counts.priority > 0 ? "priority" : "default"} />

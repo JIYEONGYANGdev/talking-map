@@ -42,6 +42,9 @@ const district = (jibun: string, road = ""): School["district"] => {
   return /옥정/.test(road) ? "옥정" : /회천|덕정|고암/.test(road) ? "회천" : "기존시가지";
 };
 
+/** 지번주소의 첫 행정 단위(법정동·읍·면). 읍·면 아래 "리" 는 버린다. 예: "양주시 백석읍 방성리 …" → 백석읍 */
+const dongOf = (jibun: string): string | undefined => jibun.match(/양주시\s+(\S+?[읍면동])(?=\s|$)/)?.[1];
+
 // 학교
 const srows = parse(readFileSync(schoolsCsv, "utf8"), { columns: true, bom: true, skip_empty_lines: true }) as Record<string, string>[];
 const schools: School[] = srows
@@ -56,6 +59,7 @@ const schools: School[] = srows
       lng: Number(pick(r, "경도")),
       address: addr,
       district: district(pick(r, "소재지지번주소"), addr),
+      dong: dongOf(pick(r, "소재지지번주소")),
     };
   })
   .filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lng));

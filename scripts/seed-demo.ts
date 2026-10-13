@@ -47,7 +47,7 @@ const DEMOS: Demo[] = [
   const schools: School[] = JSON.parse(readFileSync("data/schools.json", "utf8"));
   const base = schools.find((s) => s.name === BASE_SCHOOL);
   if (!base) throw new Error(`${BASE_SCHOOL} 가 data/schools.json 에 없습니다. npm run load-data 먼저.`);
-  const demo: School = { id: DEMO_ID, name: DEMO_NAME, lat: base.lat, lng: base.lng, address: `(시연용 가상 학교 — 지도 위치는 ${BASE_SCHOOL} 기준)`, district: base.district, sample: true };
+  const demo: School = { id: DEMO_ID, name: DEMO_NAME, lat: base.lat, lng: base.lng, address: `(시연용 가상 학교 — 지도 위치는 ${BASE_SCHOOL} 기준)`, district: base.district, dong: base.dong, sample: true };
   const idx = schools.findIndex((s) => s.id === DEMO_ID);
   if (idx >= 0) schools[idx] = demo; else schools.push(demo);
   writeFileSync("data/schools.json", JSON.stringify(schools, null, 2));
