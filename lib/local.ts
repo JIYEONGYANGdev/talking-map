@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 const SCHOOL_KEY = "tm_school";
 const REPORTS_KEY = "tm_reports";
 
-function read<T>(key: string, fallback: T): T {
+export function readLocal<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as T) : fallback;
@@ -18,7 +18,7 @@ function read<T>(key: string, fallback: T): T {
     return fallback;
   }
 }
-function write(key: string, value: unknown) {
+export function writeLocal(key: string, value: unknown) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {}
@@ -29,14 +29,14 @@ export function useSchoolId(): [string | null, (id: string | null) => void, bool
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => {
-      setIdState(read<string | null>(SCHOOL_KEY, null));
+      setIdState(readLocal<string | null>(SCHOOL_KEY, null));
       setReady(true);
     }, 0);
     return () => clearTimeout(t);
   }, []);
   const setId = useCallback((v: string | null) => {
     setIdState(v);
-    write(SCHOOL_KEY, v);
+    writeLocal(SCHOOL_KEY, v);
   }, []);
   return [id, setId, ready];
 }
@@ -48,7 +48,7 @@ export function useMyReports(): [MyReport[], (r: MyReport) => void, boolean] {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => {
-      setList(read<MyReport[]>(REPORTS_KEY, []));
+      setList(readLocal<MyReport[]>(REPORTS_KEY, []));
       setReady(true);
     }, 0);
     return () => clearTimeout(t);
@@ -56,7 +56,7 @@ export function useMyReports(): [MyReport[], (r: MyReport) => void, boolean] {
   const add = useCallback((r: MyReport) => {
     setList((prev) => {
       const next = [r, ...prev.filter((x) => x.token !== r.token)].slice(0, 50);
-      write(REPORTS_KEY, next);
+      writeLocal(REPORTS_KEY, next);
       return next;
     });
   }, []);
@@ -65,9 +65,9 @@ export function useMyReports(): [MyReport[], (r: MyReport) => void, boolean] {
 
 /** 진행 확인 페이지 등 서버 컴포넌트에서 토큰을 기기에 남길 때 */
 export function rememberReport(r: MyReport) {
-  const prev = read<MyReport[]>(REPORTS_KEY, []);
-  write(REPORTS_KEY, [r, ...prev.filter((x) => x.token !== r.token)].slice(0, 50));
+  const prev = readLocal<MyReport[]>(REPORTS_KEY, []);
+  writeLocal(REPORTS_KEY, [r, ...prev.filter((x) => x.token !== r.token)].slice(0, 50));
 }
 export function rememberSchool(id: string) {
-  write(SCHOOL_KEY, id);
+  writeLocal(SCHOOL_KEY, id);
 }

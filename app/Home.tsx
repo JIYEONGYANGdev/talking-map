@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Mascot from "@/components/Mascot";
 import RegionSheet from "@/components/RegionSheet";
 import SchoolPicker from "@/components/SchoolPicker";
-import { useMyReports, useSchoolId } from "@/lib/local";
+import { readLocal, useMyReports, useSchoolId, writeLocal } from "@/lib/local";
 import type { School } from "@/lib/types";
 
 /**
@@ -16,7 +16,10 @@ const NARROW_TAP = true;
 
 type Summary = { signals: { kind: "priority" | "inprogress" | "resolved" }[]; reviewing: number; accidents: unknown[] };
 
-export default function Home({ schools }: { schools: School[] }) {
+/** 마지막으로 받아 온 요약을 기기에 남겨 두고, 다음에 열 때 응답이 오기 전까지 그 값을 먼저 보여준다 */
+const sumKey = (schoolId: string) => `tm_sum_${schoolId}`;
+
+export default function Home({ schools, accidentCounts }: { schools: School[]; accidentCounts: Record<string, number> }) {
   const [schoolId, setSchoolId, ready] = useSchoolId();
   const [picking, setPicking] = useState(false);
   const [pickDong, setPickDong] = useState<string | undefined>(undefined); // 동네 시트에서 고른 동네로 학교 고르기
@@ -27,10 +30,11 @@ export default function Home({ schools }: { schools: School[] }) {
   useEffect(() => {
     if (ready && paramSchool && paramSchool !== schoolId && schools.some((s) => s.id === paramSchool)) setSchoolId(paramSchool);
   }, [ready, paramSchool, schoolId, schools, setSchoolId]);
-  const [sum, setSum] = useState<Summary | null>(null);
+  const [sum, setSum] = useState<{ id: string; data: Summary } | null>(null);
   const [myReports] = useMyReports();
   const school = schools.find((s) => s.id === schoolId) ?? null;
   const month = new Date().toISOString().slice(0, 7);
+  const cached = useMemo(() => (school ? readLocal<Summary | null>(sumKey(school.id), null) : null), [school]);
 
   useEffect(() => {
     if (!school) return;
@@ -38,7 +42,9 @@ export default function Home({ schools }: { schools: School[] }) {
     fetch(`/api/schools/${school.id}/signals`)
       .then((r) => r.json())
       .then((d: Summary) => {
-        if (alive) setSum(d);
+        if (!alive) return;
+        setSum({ id: school.id, data: d });
+        writeLocal(sumKey(school.id), d);
       })
       .catch(() => {});
     return () => {
@@ -65,9 +71,12 @@ export default function Home({ schools }: { schools: School[] }) {
     );
   }
 
+  const shown = sum && sum.id === school.id ? sum.data : cached;
   const counts = { priority: 0, inprogress: 0, resolved: 0 };
-  sum?.signals.forEach((s) => counts[s.kind]++);
-  const noAccidents = sum ? sum.accidents.length === 0 : true;
+  shown?.signals.forEach((s) => counts[s.kind]++);
+  // 사고다발지역은 정적 데이터라 서버가 센 값을 먼저 쓰고, 응답이 오면 그 값으로
+  const accidentN = shown ? shown.accidents.length : (accidentCounts[school.id] ?? 0);
+  const noAccidents = accidentN === 0;
   const short = school.name.replace(/초등학교(\(시연\))?$/, "초");
 
   return (
@@ -110,7 +119,7 @@ export default function Home({ schools }: { schools: School[] }) {
             ) : (
               <>
                 <h1 className="text-[19px] font-bold leading-snug">{short} 주변에<br />사고다발지역이 있어요</h1>
-                <p className="text-[13px] text-muted leading-relaxed">도로교통공단 집계 {sum?.accidents.length}곳. 지도에서 붉은 점선 원으로 표시돼요.</p>
+                <p className="text-[13px] text-muted leading-relaxed">도로교통공단 집계 {accidentN}곳. 지도에서 붉은 점선 원으로 표시돼요.</p>
               </>
             )}
             {!NARROW_TAP && <span className="text-xs font-medium text-brand-dark">지도에서 보기 ›</span>}
@@ -149,7 +158,7 @@ export default function Home({ schools }: { schools: School[] }) {
           <Tile n={counts.resolved} label="고쳐짐" dot="bg-done" ink="text-done-ink" href={`/schools/${school.id}`} />
         </div>
         <p className="text-xs text-muted px-1">
-          {sum ? (sum.reviewing > 0 ? `검토 중 ${sum.reviewing}건은 공무원이 확인한 뒤 지도에 표시돼요.` : "검토 중인 신고는 공무원이 확인한 뒤 지도에 표시돼요.") : "불러오는 중…"}
+          {shown ? (shown.reviewing > 0 ? `검토 중 ${shown.reviewing}건은 공무원이 확인한 뒤 지도에 표시돼요.` : "검토 중인 신고는 공무원이 확인한 뒤 지도에 표시돼요.") : "불러오는 중…"}
         </p>
       </section>
 
@@ -177,7 +186,7 @@ export default function Home({ schools }: { schools: School[] }) {
       <div className="bg-white border border-line rounded-xl px-[18px] py-4 flex items-center justify-between">
         <div>
           <div className="font-bold text-[15px]">{Number(month.slice(5))}월 우리 학교 길 리포트</div>
-          <div className="text-[13px] text-muted">{sum ? `신호 ${sum.signals.length + sum.reviewing}건 · 고쳐짐 ${counts.resolved}건` : "이달의 변화를 쉬운 말로"}</div>
+          <div className="text-[13px] text-muted">{shown ? `신호 ${shown.signals.length + shown.reviewing}건 · 고쳐짐 ${counts.resolved}건` : "이달의 변화를 쉬운 말로"}</div>
         </div>
         <Link href={`/schools/${school.id}/reports/${month}`} className="h-10 px-4 rounded-full bg-ink text-white text-sm font-bold flex items-center">읽기</Link>
       </div>

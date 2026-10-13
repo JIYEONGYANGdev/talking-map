@@ -32,7 +32,7 @@ npm run load-accidents 2023     # 연도 지정
 npm run dev            # 다른 터미널
 npm run demo           # 가상 학교 + 신고 8건(사진 4장 포함) + 공무원 처리 + 이번 달 리포트
 ```
-- 가상 학교 **연푸룬초등학교(시연)** (`/schools/demo-yeonpurun`)를 만든다. 지도 위치는 실제 연푸른초등학교 자리. `npm run load-data`를 다시 돌려도 유지된다.
+- 가상 학교 **연푸룬초등학교** (`/schools/demo-yeonpurun`)를 만든다. 지도 위치는 실제 연푸른초등학교 자리. `npm run load-data`를 다시 돌려도 유지된다.
 - 신고 8건을 실제 Claude 분류로 접수한 뒤 공무원 API로 처리해 지도에 점검 우선(같은 횡단보도 2건)·처리 중·고쳐짐이 모두 보이고, 2건은 "검토 중"으로 남아 공무원 화면 "AI 제안 대기" 탭에서 확정 시연을 할 수 있다.
 - 예시 사진은 `public/demo-photos/*-real.png` 9장(횡단보도 위 차량 2종, 깨진 보도블록, 꺼진 가로등, 공사장 트럭 2종, 통학버스, 과속, 방치 킥보드). 시연 신고 8건 중 6건, 모의 신고 12건 중 8건에 연결돼 있고(`data/mock-reports.json`의 `photo`), 신고 폼 시연에서 그대로 올려도 된다. 그림 버전은 `public/demo-photos/표현 이미지/`, 원본 SVG는 `scripts/demo-photos/`(`npm run demo-photos`, macOS).
 - 다시 실행하면 이전 시연 신고를 지우고 새로 만든다. 시연 URL 목록이 끝에 출력된다.

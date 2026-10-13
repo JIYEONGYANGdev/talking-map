@@ -3,7 +3,7 @@
  *   npm run demo
  *
  * 하는 일
- *  1) 가상 학교 "연푸룬초등학교(시연)" 를 data/schools.json 에 추가 (좌표는 실제 연푸른초등학교 위치, id demo-yeonpurun)
+ *  1) 가상 학교 "연푸룬초등학교" 를 data/schools.json 에 추가 (좌표는 실제 연푸른초등학교 위치, id demo-yeonpurun)
  *     - load-data 를 다시 돌려도 demo-* 학교는 유지된다.
  *  2) 신고 8건을 POST /api/reports 로 접수 (6건은 public/demo-photos/*-real.png 실사 포함, Claude 가 실제로 분류)
  *     - 그림 버전은 public/demo-photos/표현 이미지/ 에 있다 (npm run demo-photos 로 재생성)
@@ -23,7 +23,7 @@ for (const f of [".env.local", ".env"]) if (existsSync(f)) { try { process.loadE
 const BASE = process.env.BASE ?? "http://127.0.0.1:3000";
 const PW = process.env.ADMIN_PASSWORD ?? "yangju2026";
 const DEMO_ID = "demo-yeonpurun";
-const DEMO_NAME = "연푸룬초등학교(시연)";
+const DEMO_NAME = "연푸룬초등학교";
 const BASE_SCHOOL = "연푸른초등학교"; // 좌표를 빌려올 실제 학교
 
 type Demo = {
