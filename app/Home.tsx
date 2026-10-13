@@ -8,6 +8,12 @@ import SchoolPicker from "@/components/SchoolPicker";
 import { useMyReports, useSchoolId } from "@/lib/local";
 import type { School } from "@/lib/types";
 
+/**
+ * 시연 녹화용 스위치. true 면 홈 카드에서 글자·그림 부분만 눌러서 이동하고 카드 여백은 반응하지 않는다
+ * (사고 배너: 캐릭터·글자 / 숫자 타일: 점·숫자·이름 / 내 신고: 오른쪽 화살표). 녹화가 끝나면 false 로 되돌린다.
+ */
+const NARROW_TAP = true;
+
 type Summary = { signals: { kind: "priority" | "inprogress" | "resolved" }[]; reviewing: number; accidents: unknown[] };
 
 export default function Home({ schools }: { schools: School[] }) {
@@ -90,23 +96,38 @@ export default function Home({ schools }: { schools: School[] }) {
         />
       )}
 
-      <Link href={`/schools/${school.id}`} aria-label={`${school.name} 주변 지도 보기`} className="bg-white border border-line rounded-2xl p-5 flex items-center gap-3.5 active:bg-ground-deep">
-        <Mascot size={64} mood={counts.priority > 0 ? "priority" : "default"} />
-        <div className="flex flex-col gap-1.5">
-          {noAccidents ? (
-            <>
-              <h1 className="text-[19px] font-bold leading-snug">{short} 주변은 아직<br />사고 지도에 없어요</h1>
-              <p className="text-[13px] text-muted leading-relaxed">사고가 쌓이기 전에, 학부모의 신고가 첫 신호가 됩니다.</p>
-            </>
-          ) : (
-            <>
-              <h1 className="text-[19px] font-bold leading-snug">{short} 주변에<br />사고다발지역이 있어요</h1>
-              <p className="text-[13px] text-muted leading-relaxed">도로교통공단 집계 {sum?.accidents.length}곳. 지도에서 붉은 점선 원으로 표시돼요.</p>
-            </>
-          )}
-          <span className="text-xs font-medium text-brand-dark">지도에서 보기 ›</span>
-        </div>
-      </Link>
+      {(() => {
+        const mapHref = `/schools/${school.id}`;
+        const label = `${school.name} 주변 지도 보기`;
+        const mascot = <Mascot size={64} mood={counts.priority > 0 ? "priority" : "default"} />;
+        const text = (
+          <>
+            {noAccidents ? (
+              <>
+                <h1 className="text-[19px] font-bold leading-snug">{short} 주변은 아직<br />사고 지도에 없어요</h1>
+                <p className="text-[13px] text-muted leading-relaxed">사고가 쌓이기 전에, 학부모의 신고가 첫 신호가 됩니다.</p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-[19px] font-bold leading-snug">{short} 주변에<br />사고다발지역이 있어요</h1>
+                <p className="text-[13px] text-muted leading-relaxed">도로교통공단 집계 {sum?.accidents.length}곳. 지도에서 붉은 점선 원으로 표시돼요.</p>
+              </>
+            )}
+            <span className="text-xs font-medium text-brand-dark">지도에서 보기 ›</span>
+          </>
+        );
+        return NARROW_TAP ? (
+          <div className="bg-white border border-line rounded-2xl p-5 flex items-center gap-3.5">
+            <Link href={mapHref} aria-label={label} className="flex-none active:opacity-70">{mascot}</Link>
+            <Link href={mapHref} aria-label={label} className="flex flex-col gap-1.5 active:opacity-70">{text}</Link>
+          </div>
+        ) : (
+          <Link href={mapHref} aria-label={label} className="bg-white border border-line rounded-2xl p-5 flex items-center gap-3.5 active:bg-ground-deep">
+            {mascot}
+            <div className="flex flex-col gap-1.5">{text}</div>
+          </Link>
+        );
+      })()}
 
       <Link href={`/report?school=${school.id}`} className="h-[60px] rounded-xl bg-brand text-white font-bold text-[17px] flex items-center justify-center gap-2.5 shadow-sm active:bg-brand-dark">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" /><circle cx="12" cy="13" r="3.5" /></svg>
@@ -128,13 +149,26 @@ export default function Home({ schools }: { schools: School[] }) {
         </p>
       </section>
 
-      <Link href="/my" className="bg-white border border-line rounded-xl px-[18px] py-4 flex items-center justify-between">
-        <div>
-          <div className="font-bold text-[15px]">내 신고</div>
-          <div className="text-[13px] text-muted">{myReports.length ? `${myReports.length}건 보냈어요 · 진행 상황 보기` : "아직 보낸 신고가 없어요"}</div>
-        </div>
-        <svg className="text-muted" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
-      </Link>
+      {(() => {
+        const text = (
+          <div>
+            <div className="font-bold text-[15px]">내 신고</div>
+            <div className="text-[13px] text-muted">{myReports.length ? `${myReports.length}건 보냈어요 · 진행 상황 보기` : "아직 보낸 신고가 없어요"}</div>
+          </div>
+        );
+        const chevron = <svg className="text-muted" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>;
+        return NARROW_TAP ? (
+          <div className="bg-white border border-line rounded-xl px-[18px] py-4 flex items-center justify-between">
+            {text}
+            <Link href="/my" aria-label="내 신고 보기" className="w-10 h-10 -mr-2.5 rounded-full flex items-center justify-center active:bg-ground-deep">{chevron}</Link>
+          </div>
+        ) : (
+          <Link href="/my" className="bg-white border border-line rounded-xl px-[18px] py-4 flex items-center justify-between">
+            {text}
+            {chevron}
+          </Link>
+        );
+      })()}
 
       <div className="bg-white border border-line rounded-xl px-[18px] py-4 flex items-center justify-between">
         <div>
@@ -148,11 +182,23 @@ export default function Home({ schools }: { schools: School[] }) {
 }
 
 function Tile({ n, label, dot, ink, href }: { n: number; label: string; dot: string; ink: string; href: string }) {
-  return (
-    <Link href={href} aria-label={`${label} ${n}건, 지도에서 보기`} className="bg-white border border-line rounded-xl py-3.5 px-3 flex flex-col items-center gap-1 active:bg-ground-deep">
+  const body = (
+    <>
       <div className={`w-2.5 h-2.5 rounded-full ${dot}`} />
       <div className={`text-[26px] font-bold leading-none ${ink}`}>{n}</div>
       <div className="text-xs text-muted">{label}</div>
+    </>
+  );
+  const aria = `${label} ${n}건, 지도에서 보기`;
+  if (NARROW_TAP)
+    return (
+      <div className="bg-white border border-line rounded-xl py-3.5 px-3 flex flex-col items-center">
+        <Link href={href} aria-label={aria} className="flex flex-col items-center gap-1 px-1 active:opacity-70">{body}</Link>
+      </div>
+    );
+  return (
+    <Link href={href} aria-label={aria} className="bg-white border border-line rounded-xl py-3.5 px-3 flex flex-col items-center gap-1 active:bg-ground-deep">
+      {body}
     </Link>
   );
 }
