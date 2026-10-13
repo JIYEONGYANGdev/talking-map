@@ -2,27 +2,16 @@
 import { useEffect, useState } from "react";
 import Mascot from "@/components/Mascot";
 
-const KEY = "tm_splash_seen";
-
 /**
- * 서비스에 처음 들어올 때 잠깐 보여주는 소개 화면. 탭당 한 번(sessionStorage), 1.6초 뒤 자동으로 사라지고 탭하면 바로 닫힌다.
+ * 서비스 주소(/)로 들어올 때마다 잠깐 보여주는 소개 화면. 1.6초 뒤 자동으로 사라지고 탭하면 바로 닫힌다.
+ * 앱 안에서 탭을 오가는 동안은 다시 뜨지 않고(AppShell 이 한 번만 마운트), 진행 확인 링크(/reports/…)처럼 깊은 주소로 들어올 때도 띄우지 않는다.
  * 화면을 가리기만 하고 데이터 로딩은 뒤에서 그대로 진행된다.
  */
 export default function Splash() {
   const [phase, setPhase] = useState<"hidden" | "show" | "fade">("hidden");
   useEffect(() => {
-    let seen = true;
-    try {
-      seen = sessionStorage.getItem(KEY) === "1";
-    } catch {}
-    if (seen) return;
-    // "봤다" 표시는 사라질 때 남긴다 (마운트 때 남기면 개발 모드의 effect 2회 실행에서 두 번째 실행이 바로 건너뛴다)
-    const done = () => {
-      try {
-        sessionStorage.setItem(KEY, "1");
-      } catch {}
-      setPhase("hidden");
-    };
+    if (window.location.pathname !== "/") return;
+    const done = () => setPhase("hidden");
     const t0 = setTimeout(() => setPhase("show"), 0);
     const t1 = setTimeout(() => setPhase("fade"), 1600);
     const t2 = setTimeout(done, 2100);
@@ -33,12 +22,7 @@ export default function Splash() {
     };
   }, []);
   if (phase === "hidden") return null;
-  const dismiss = () => {
-    try {
-      sessionStorage.setItem(KEY, "1");
-    } catch {}
-    setPhase("hidden");
-  };
+  const dismiss = () => setPhase("hidden");
   return (
     <div
       onClick={dismiss}
