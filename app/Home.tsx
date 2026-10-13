@@ -10,7 +10,7 @@ import type { School } from "@/lib/types";
 
 /**
  * 시연 녹화용 스위치. true 면 홈 카드에서 글자·그림 부분만 눌러서 이동하고 카드 여백은 반응하지 않는다
- * (사고 배너: 캐릭터·글자 / 숫자 타일: 점·숫자·이름 / 내 신고: 오른쪽 화살표). 녹화가 끝나면 false 로 되돌린다.
+ * (사고 배너: "지도에서 보기" 글자 / 숫자 타일: 점·숫자·이름 / 내 신고: 오른쪽 화살표). 녹화가 끝나면 false 로 되돌린다.
  */
 const NARROW_TAP = true;
 
@@ -113,13 +113,17 @@ export default function Home({ schools }: { schools: School[] }) {
                 <p className="text-[13px] text-muted leading-relaxed">도로교통공단 집계 {sum?.accidents.length}곳. 지도에서 붉은 점선 원으로 표시돼요.</p>
               </>
             )}
-            <span className="text-xs font-medium text-brand-dark">지도에서 보기 ›</span>
+            {!NARROW_TAP && <span className="text-xs font-medium text-brand-dark">지도에서 보기 ›</span>}
           </>
         );
+        // 녹화용: "지도에서 보기" 글자만 누를 수 있다 (캐릭터·제목·설명은 반응하지 않음)
         return NARROW_TAP ? (
           <div className="bg-white border border-line rounded-2xl p-5 flex items-center gap-3.5">
-            <Link href={mapHref} aria-label={label} className="flex-none active:opacity-70">{mascot}</Link>
-            <Link href={mapHref} aria-label={label} className="flex flex-col gap-1.5 active:opacity-70">{text}</Link>
+            {mascot}
+            <div className="flex flex-col gap-1.5">
+              {text}
+              <Link href={mapHref} aria-label={label} className="self-start text-xs font-medium text-brand-dark active:opacity-70">지도에서 보기 ›</Link>
+            </div>
           </div>
         ) : (
           <Link href={mapHref} aria-label={label} className="bg-white border border-line rounded-2xl p-5 flex items-center gap-3.5 active:bg-ground-deep">
