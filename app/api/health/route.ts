@@ -43,5 +43,8 @@ export async function GET() {
     },
     vercel: Boolean(process.env.VERCEL),
     region: process.env.VERCEL_REGION ?? null,
+    // 어느 커밋이 배포돼 있는지 (Vercel 이 빌드 때 넣어 줌). 환경변수 변경 후 재배포 확인용
+    commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null,
+    deployedAt: process.env.VERCEL_DEPLOYMENT_ID ? new Date().toISOString() : null,
   });
 }
