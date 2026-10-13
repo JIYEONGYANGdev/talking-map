@@ -45,6 +45,7 @@ npm run dev / npm run load-data / npm run load-accidents / npm run seed (모의 
 ## 환경 (Mac) — 어기면 전부 막힘
 - 시스템 Node 14 금지. nvm Node 22 (`.nvmrc`). `~/.zshenv` 가 nvm 을 로드하므로 zsh 라면 어디서나 v22. bash -lc 는 아직 v14.
 - `.claude/launch.json` 의 dev 는 `zsh -c "npm run dev"` 로 띄운다(Turbopack 자식 node 도 22 여야 함). `next dev` 와 `next build` 를 동시에 돌리지 말 것(.next 공유). Turbopack 패닉에 `internal/modules/cjs/loader.js` 가 보이면 Node 14 워커 → PATH 고친 뒤 `rm -rf .next`.
+- git 커밋 작성자는 GitHub 계정에 연결된 이메일이어야 한다(저장소 로컬 config 에 `82949221+JIYEONGYANGdev@users.noreply.github.com` 설정, 10/13). 호스트명 이메일(`@…MacBookAir.local`)로 커밋하면 Vercel 이 "Deployment was blocked" 로 배포를 막는다. 배포 여부는 `gh api repos/JIYEONGYANGdev/talking-map/commits/<sha>/status` 로 확인.
 - `lib/ai.ts`: Sonnet 5.5 는 강제 tool_choice 를 거부 → auto + strict. 조직 범위 키는 ANTHROPIC_WORKSPACE_ID 헤더 필요.
 
 ## AI 활용 기록 (공모전 평가용)
