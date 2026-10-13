@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Splash from "@/components/Splash";
 
 /**
  * 화면 틀. 학부모 화면은 모바일 폭(최대 430px) + 하단 탭 3개(홈·지도·내 신고),
@@ -35,6 +36,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex justify-center">
+      <Splash />
       <div className="w-full max-w-[430px] min-h-screen flex flex-col bg-ground">
         <main className={`flex-1 flex flex-col ${hideTab ? "" : isMapPage ? "pb-[84px]" : "pb-24"}`}>{children}</main>
         {!hideTab && <BottomTab active={tab} />}

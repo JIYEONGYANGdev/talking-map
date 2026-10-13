@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { MapSignal } from "@/components/SchoolMap";
 import { rememberSchool } from "@/lib/local";
-import { MARKER_LABEL } from "@/lib/geo";
+import { distanceM, MARKER_LABEL } from "@/lib/geo";
 import type { Accident, School, Zone } from "@/lib/types";
 
 const SchoolMap = dynamic(() => import("@/components/SchoolMap"), { ssr: false });
@@ -22,6 +22,25 @@ const PILL: Record<string, string> = {
 export default function SchoolMapClient({ school, schools }: { school: School; schools: { id: string; name: string }[] }) {
   const router = useRouter();
   const [data, setData] = useState<Data | null>(null);
+  const [view, setView] = useState({ lat: school.lat, lng: school.lng }); // 사용자가 보고 있는 지도 중심
+  const [focus, setFocus] = useState<{ lat: number; lng: number; id?: string; n: number } | null>(null);
+  const [miss, setMiss] = useState<string | null>(null);
+
+  /** 현재 지도 중심에서 가장 가까운 항목으로 이동 */
+  function goNearest(items: { id: string; lat: number | null; lng: number | null }[], prefix: string, label: string) {
+    const list = items.filter((x): x is { id: string; lat: number; lng: number } => x.lat != null && x.lng != null);
+    if (!list.length) {
+      setMiss(`${label}이(가) 아직 없어요`);
+      setTimeout(() => setMiss(null), 1800);
+      return;
+    }
+    const best = list.reduce((a, b) => (distanceM(view.lat, view.lng, b.lat, b.lng) < distanceM(view.lat, view.lng, a.lat, a.lng) ? b : a));
+    setFocus((prev) => ({ lat: best.lat, lng: best.lng, id: `${prefix}:${best.id}`, n: (prev?.n ?? 0) + 1 }));
+  }
+  const goSignal = (s: MapSignal) => {
+    if (s.lat == null || s.lng == null) return;
+    setFocus((prev) => ({ lat: s.lat!, lng: s.lng!, id: `signal:${s.id}`, n: (prev?.n ?? 0) + 1 }));
+  };
   useEffect(() => {
     rememberSchool(school.id);
     let alive = true;
@@ -44,13 +63,13 @@ export default function SchoolMapClient({ school, schools }: { school: School; s
     <div className="flex flex-col overflow-hidden" style={{ height: "calc(100dvh - 84px)" }}>
       <div className="relative flex-1 min-h-0">
         {data ? (
-          <SchoolMap center={{ lat: school.lat, lng: school.lng, name: school.name }} radiusM={data.radiusM} signals={data.signals} zones={data.zones} accidents={data.accidents ?? []} height="100%" />
+          <SchoolMap center={{ lat: school.lat, lng: school.lng, name: school.name }} radiusM={data.radiusM} signals={data.signals} zones={data.zones} accidents={data.accidents ?? []} height="100%" focus={focus} onViewChange={setView} />
         ) : (
           <div className="h-full bg-ground-deep animate-pulse" />
         )}
 
-        <div className="absolute left-4 right-4 top-4 flex items-center justify-between pointer-events-none" style={{ zIndex: 1000 }}>
-          <label className="pointer-events-auto relative h-10 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center pl-3 pr-8">
+        <div className="absolute left-4 right-4 top-4 flex items-center justify-between pointer-events-none select-none" style={{ zIndex: 1000 }}>
+          <label className="pointer-events-auto select-none relative h-10 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center pl-3 pr-8">
             <svg className="shrink-0 text-brand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z" /><circle cx="12" cy="10" r="2.5" /></svg>
             <span className="sr-only">학교 바꾸기</span>
             <select value={school.id} onChange={(e) => router.push(`/schools/${e.target.value}`)} className="appearance-none bg-transparent pl-1.5 text-[15px] font-bold outline-none max-w-[200px] truncate">
@@ -65,13 +84,18 @@ export default function SchoolMapClient({ school, schools }: { school: School; s
           </Link>
         </div>
 
-        <div className="absolute left-4 right-4 top-[68px] flex flex-wrap gap-1.5 pointer-events-none" style={{ zIndex: 1000 }}>
-          <Chip dot="bg-priority" label={`점검 우선 ${counts.priority}`} bold />
-          <Chip dot="bg-progress" label={`처리 중 ${counts.inprogress}`} bold />
-          <Chip dot="bg-done" label={`고쳐짐 ${counts.resolved}`} bold />
-          <Chip dot="bg-zone border border-zone-ink" label="보호구역" />
-          <Chip dot="border-[1.5px] border-dashed border-priority" label="사고다발" />
+        <div className="absolute left-4 right-4 top-[68px] flex flex-wrap gap-1.5 pointer-events-none select-none" style={{ zIndex: 1000 }}>
+          <Chip dot="bg-priority" label={`점검 우선 ${counts.priority}`} bold onClick={() => data && goNearest(data.signals.filter((x) => x.kind === "priority"), "signal", "점검 우선 신호")} />
+          <Chip dot="bg-progress" label={`처리 중 ${counts.inprogress}`} bold onClick={() => data && goNearest(data.signals.filter((x) => x.kind === "inprogress"), "signal", "처리 중 신호")} />
+          <Chip dot="bg-done" label={`고쳐짐 ${counts.resolved}`} bold onClick={() => data && goNearest(data.signals.filter((x) => x.kind === "resolved"), "signal", "고쳐진 신호")} />
+          <Chip dot="bg-zone border border-zone-ink" label="보호구역" onClick={() => data && goNearest(data.zones, "zone", "보호구역")} />
+          <Chip dot="border-[1.5px] border-dashed border-priority" label="사고다발" onClick={() => data && goNearest(data.accidents ?? [], "accident", "사고다발지역")} />
         </div>
+        {miss && (
+          <div className="absolute left-1/2 -translate-x-1/2 top-[150px] px-3 py-1.5 rounded-lg bg-ink/85 text-white text-xs" style={{ zIndex: 1000 }} role="status">
+            {miss}
+          </div>
+        )}
       </div>
 
       <div className="relative -mt-6 flex-none max-h-[52%] overflow-y-auto overscroll-contain bg-white rounded-t-2xl shadow-[0_-6px_20px_rgba(0,0,0,0.08)] px-5 pb-4 flex flex-col gap-3" style={{ zIndex: 1001 }}>
@@ -94,9 +118,12 @@ export default function SchoolMapClient({ school, schools }: { school: School; s
         {data && data.signals.length > 0 && (
           <ul className="divide-y divide-line">
             {data.signals.map((s) => (
-              <li key={s.id} className="py-2.5 flex items-center gap-3">
-                <span className={`shrink-0 h-6 px-2 rounded-full text-[11px] font-bold inline-flex items-center ${PILL[s.kind]}`}>{MARKER_LABEL[s.kind]}</span>
-                <span className="text-[13px] leading-snug"><span className="text-muted">{s.category} · </span>{s.summary}</span>
+              <li key={s.id}>
+                <button type="button" onClick={() => goSignal(s)} className="w-full text-left py-2.5 flex items-center gap-3 active:bg-ground rounded-lg">
+                  <span className={`shrink-0 h-6 px-2 rounded-full text-[11px] font-bold inline-flex items-center ${PILL[s.kind]}`}>{MARKER_LABEL[s.kind]}</span>
+                  <span className="text-[13px] leading-snug"><span className="text-muted">{s.category} · </span>{s.summary}</span>
+                  <svg className="shrink-0 ml-auto text-faint" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z" /><circle cx="12" cy="10" r="2.5" /></svg>
+                </button>
               </li>
             ))}
           </ul>
@@ -112,11 +139,12 @@ export default function SchoolMapClient({ school, schools }: { school: School; s
   );
 }
 
-function Chip({ dot, label, bold }: { dot: string; label: string; bold?: boolean }) {
+/** 범례 칩. 누르면 현재 보고 있는 위치에서 가장 가까운 해당 항목으로 지도가 이동한다 */
+function Chip({ dot, label, bold, onClick }: { dot: string; label: string; bold?: boolean; onClick?: () => void }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full bg-white text-xs shadow-[0_1px_4px_rgba(0,0,0,0.1)] ${bold ? "font-bold text-ink" : "font-medium text-muted"}`}>
+    <button type="button" onClick={onClick} title="가장 가까운 곳으로 이동" className={`pointer-events-auto inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full bg-white text-xs shadow-[0_1px_4px_rgba(0,0,0,0.1)] active:bg-ground-deep ${bold ? "font-bold text-ink" : "font-medium text-muted"}`}>
       <span className={`w-2 h-2 rounded-full ${dot}`} />
       {label}
-    </span>
+    </button>
   );
 }

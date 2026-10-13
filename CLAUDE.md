@@ -20,6 +20,8 @@
 - 신고는 3단계 한 컴포넌트(app/report/ReportForm.tsx): 사진 → 한 줄(표현 칩) → 위치·보내기. 종류 선택 없음. 신고 중에는 하단 탭 숨김.
 - 기기 저장(lib/local.ts, localStorage): 고른 학교 `tm_school`, 내 신고 토큰 `tm_reports`. 로그인 없음. 진행 확인 페이지를 열면 그 신고도 기기에 기억.
 - 캐릭터 "핀이"(components/Mascot.tsx)는 빈 상태·안내에만. 데이터 위에 올리지 않는다.
+- 지도 페이지는 화면 높이에 고정(지도 flex + 바텀시트 내부 스크롤). 범례 칩을 누르면 현재 지도 중심에서 가장 가까운 해당 항목으로 날아가 말풍선을 열고(SchoolMap `focus`/`onViewChange`), 목록 항목·지도 점을 누르면 그 위치로 이동.
+- 처음 들어올 때 스플래시(components/Splash.tsx) 1.6초, 탭당 한 번(sessionStorage tm_splash_seen). 공무원 화면에는 없음.
 - 공무원 /admin(데스크톱 기준, 최대 1152px): 지표 4개(확인 대기·처리 중·이달 고쳐짐·신고→첫 조치 중앙값) → 도구 줄(상태 탭+건수, 학교 필터, 검색, 월간 리포트 생성) → 카드(사진 | 신고 글·AI 요약·이유·근거·좌표 보정 | 학교·종류·기관 선택 + 확정/고쳐짐/해당 없음). 쓰기는 PATCH /api/admin/signals/:id 하나.
 
 ## 저장소
