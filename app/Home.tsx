@@ -185,7 +185,10 @@ export default function Home({ schools, accidentCounts }: { schools: School[]; a
 
       <div className="bg-white border border-line rounded-xl px-[18px] py-4 flex items-center justify-between">
         <div>
-          <div className="font-bold text-[15px]">{Number(month.slice(5))}월 우리 학교 길 리포트</div>
+          <div className="font-bold text-[15px] flex items-center gap-1">
+            이번 달 AI 요약 리포트
+            <svg className="text-brand" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5 14.1 9l6.4 2.1-6.4 2.1L12 19.5l-2.1-6.3L3.5 11.1 9.9 9z" /><path d="M19 15.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" opacity=".8" /><path d="M5 2l.7 1.8L7.5 4.5l-1.8.7L5 7l-.7-1.8-1.8-.7 1.8-.7z" opacity=".7" /></svg>
+          </div>
           <div className="text-[13px] text-muted">{shown ? `신호 ${shown.signals.length + shown.reviewing}건 · 고쳐짐 ${counts.resolved}건` : "이달의 변화를 쉬운 말로"}</div>
         </div>
         <Link href={`/schools/${school.id}/reports/${month}`} className="h-10 px-4 rounded-full bg-ink text-white text-sm font-bold flex items-center">읽기</Link>
