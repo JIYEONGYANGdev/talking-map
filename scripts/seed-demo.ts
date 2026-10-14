@@ -108,7 +108,10 @@ const DEMOS: Demo[] = [
   // 4) 월간 리포트
   const month = new Date().toISOString().slice(0, 7);
   const rep = await fetch(`${BASE}/api/admin/reports/generate`, { method: "POST", headers: { "content-type": "application/json", cookie }, body: JSON.stringify({ schoolId: DEMO_ID, month }) }).then((r) => r.json());
-  console.log(`월간 리포트 ${month}: 신호 ${rep.total}건, 고쳐짐 ${rep.resolved}건`);
+  console.log(`월간 리포트 ${month}: 신호 ${rep.total}건, 고쳐짐 ${rep.resolved}건 (초안)`);
+  // 시연용이라 바로 공개한다. 실제 운영은 /admin/reports/<school>/<month> 에서 담당자가 읽고 공개.
+  const pub = await fetch(`${BASE}/api/admin/reports/monthly/${DEMO_ID}/${month}`, { method: "PATCH", headers: { "content-type": "application/json", cookie }, body: JSON.stringify({ action: "publish" }) });
+  console.log(pub.ok ? "월간 리포트 공개됨" : `월간 리포트 공개 실패 (${pub.status}) — 자동 점검 불통과면 /admin/reports/${DEMO_ID}/${month} 에서 고쳐서 공개`);
 
   console.log("\n시연 URL");
   console.log(`  학부모 지도      ${BASE}/schools/${DEMO_ID}`);

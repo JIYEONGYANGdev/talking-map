@@ -23,7 +23,8 @@
 - 홈 우측 상단 지역 표시(동 · 양주시)를 누르면 동네 시트(components/RegionSheet.tsx): 현재 지역 양주시 + 학교가 있는 법정동·읍·면 칩(3열, 학교 수 표시) + "현재는 양주시에서만 서비스, 추후 확대" 문구. 칩을 누르면 SchoolPicker 가 그 동네 학교만 보여준다(`dong` prop). 동은 School.dong(지번주소에서 load-data 가 추출, 시연 학교는 옥정동).
 - 지도 페이지는 화면 높이에 고정(지도 flex + 바텀시트 내부 스크롤). 범례 칩을 누르면 현재 지도 중심에서 가장 가까운 해당 항목으로 날아가 말풍선을 열고(SchoolMap `focus`/`onViewChange`), 목록 항목·지도 점을 누르면 그 위치로 이동.
 - 스플래시(components/Splash.tsx)는 현재 꺼져 있음(`SPLASH_ENABLED=false`, 시연 영상에 따로 붙임). 켜면 주소 `/` 로 들어올 때마다 1.6초(`HOLD_UNTIL_TAP=true` 면 탭할 때까지). 깊은 주소(/reports/:token 등)로 진입하면 안 뜨고, 앱 안 탭 이동에서도 다시 안 뜸. 공무원 화면에는 없음.
-- 공무원 /admin(데스크톱 기준, 최대 1152px): 지표 4개(확인 대기·처리 중·이달 고쳐짐·신고→첫 조치 중앙값) → 도구 줄(상태 탭+건수, 학교 필터, 검색, 월간 리포트 생성) → 카드(사진 | 신고 글·AI 요약·이유·근거·좌표 보정 | 학교·종류·기관 선택 + 확정/고쳐짐/해당 없음). 쓰기는 PATCH /api/admin/signals/:id 하나(상태·종류·기관·좌표). DELETE /api/admin/signals/:id 는 신호+신고+사진을 함께 지움(카드 오른쪽 아래 작은 "삭제" 글자 버튼, 확인창 1회).
+- 공무원 /admin(데스크톱 기준, 최대 1152px): 지표 4개(확인 대기·처리 중·이달 고쳐짐·신고→첫 조치 중앙값) → 도구 줄(상태 탭+건수, 학교 필터, 검색) → 월간 리포트 패널(app/admin/ReportPanel.tsx, 시안 10: 학교를 고르면 펼침 — 월 선택·들어갈 신호 수·상태 미생성/초안/공개됨·버튼 하나; 모든 학교면 한 줄 요약) → 카드(사진 | 신고 글·AI 요약·이유·근거·좌표 보정 | 학교·종류·기관 선택 + 확정/고쳐짐/해당 없음). 쓰기는 PATCH /api/admin/signals/:id 하나(상태·종류·기관·좌표).
+- 월간 리포트는 초안→공개 2단계(2026-10-14, 시안 11): POST /api/admin/reports/generate 가 draft 를 만들고, /admin/reports/:school/:month(ReportEditor.tsx)에서 담당자가 본문을 고쳐 PATCH /api/admin/reports/monthly/:school/:month `{body, action: save|publish|unpublish}`. 공개 전 자동 점검 3개(lib/report.ts checkReport: 첫 문장 숫자 일치·개인정보 흔적·점수/순위 표현)를 서버에서도 검사해 불통과면 422. 학부모 /schools/:id/reports/:month 는 published 만 보여 주고, 공무원 쿠키가 있으면 초안을 미리보기 배너와 함께 보여 줌. status 없는 옛 리포트는 공개로 취급(lib/db isPublished). Supabase 는 supabase/migrations/2026-10-14_monthly_report_status.sql 을 실행해야 상태가 저장됨(없으면 상태 열 없이 저장하고 경고). DELETE /api/admin/signals/:id 는 신호+신고+사진을 함께 지움(카드 오른쪽 아래 작은 "삭제" 글자 버튼, 확인창 1회).
 
 ## 저장소
 - SUPABASE_URL 없으면 data/db.json 파일 저장소(로컬 시연용). Vercel 배포 시 Supabase 필수(supabase/schema.sql: report, signal, monthly_report). 월간 리포트도 store 를 통해 저장(파일 or 테이블). 배포 절차는 docs/deploy.md.
@@ -67,3 +68,10 @@ docs/ai-usage-log.md 를 계속 갱신한다. **1부 기획 아이템 관점**(�
 - data/agencies.json 을 실제 과·팀 기준으로 교체(백업: data/agencies.backup-2026-10-10.json). id 는 유지하고 이름·근거를 고쳤으며, `yangju-traffic-facility`(교통과 교통시설팀, 속도·교통량) 1개를 추가. 기존 `yangju-traffic` 은 차량관리과(불법주정차), `yangju-safety` 는 민원여권과 민원행정팀(기타 배분)으로 의미가 바뀜. `note` 필드는 내부 메모(프롬프트에는 안 들어감, Agency 타입에 없음 — 타입에 optional 로 추가해도 됨).
 - data/mock-reports.json 의 속도·교통량 1건 라벨을 `yangju-traffic-facility` 로 변경. **Code 탭에서 할 일**: `npm run seed` 로 정확도 재측정(기관 12/12 유지 확인) → 커밋·push(배포본 반영). /admin 카드와 /reports/:token 의 담당 기관 이름이 "양주시 교통 부서" → "양주시 차량관리과 (차량관리팀)" 식으로 바뀌므로 발표자료 시연 캡처는 재배포 후 다시 찍는다.
 - 근거: 양주시청 행정조직도(contents.do?key=377)·부서별 업무내용(selectEmployeeList.do). 시민안전과는 교통·통학로 업무가 없고(어린이놀이시설·재난), 통학로 민원은 도로교통국의 교통과·차량관리과·도로관리과에 걸쳐 있음.
+
+## 월간 리포트 UI 개선 (2026-10-14, Cowork 결정)
+UX 시안: Claude Design 캔버스 「말하는 지도 학부모 앱 UX 시안」 아트보드 10(개선안 A)·11(개선안 B).
+- A(필수, 녹화 전): /admin 도구 줄의 "월간 리포트 · 학교 ▼ · 생성" 제거. 학교 필터를 고르면 카드 목록 위에 그 학교 리포트 패널: 월 선택(YYYY-MM), 상태 칩(미생성/초안/공개됨), 들어갈 신호 수(처리 중·고쳐짐·확인 중, 확인 대기·해당 없음 제외), AI 초안 생성 시각, 지난달 링크, 버튼 "초안 확인하고 공개" / "다시 생성". 모든 학교 상태면 한 줄 요약만.
+- B(다음 단계): /admin/reports/[school]/[month] 초안 확인 화면 — 본문 textarea 수정, 자동 점검 3개(첫 문장 숫자=입력, 이름·상호 없음, 점수·순위 없음), 들어간 신호 목록, "학부모에게 공개" / "초안으로 저장" / "AI 초안 다시 받기".
+- 데이터: monthly_report에 status('draft'|'published'), publishedAt, editedBy 추가. /schools/[id]/reports/[month]는 published만 조회. generate 라우트는 draft로 저장.
+- 법령 표: data/agencies.json 10/11 law.go.kr 대조 완료(제목 3곳·규칙 7조 추가) — 커밋 필요.

@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Mascot from "@/components/Mascot";
+import ReportPanel from "./ReportPanel";
 import { CATEGORIES, type Agency, type School, type Signal, type Status } from "@/lib/types";
 
 const SchoolMap = dynamic(() => import("@/components/SchoolMap"), { ssr: false });
@@ -30,8 +31,8 @@ const STATUS_PILL: Record<Status, { label: string; cls: string }> = {
 
 /**
  * 공무원 점검표 (데스크톱 기준).
- * 위: 지표 4개 → 도구 줄(상태 탭·학교·검색·리포트) → 신호 카드(사진 | 내용·AI 정리 | 조치).
- * 모든 쓰기는 PATCH /api/admin/signals/:id 하나로 간다.
+ * 위: 지표 4개 → 도구 줄(상태 탭·학교·검색) → 월간 리포트 패널(학교를 고르면 펼침) → 신호 카드(사진 | 내용·AI 정리 | 조치).
+ * 신호 쓰기는 PATCH/DELETE /api/admin/signals/:id, 리포트는 app/admin/ReportPanel.tsx 와 /admin/reports/:school/:month.
  */
 export default function AdminBoard({ schools, agencies }: { schools: School[]; agencies: Agency[] }) {
   const [tab, setTab] = useState<Status | "all">("ai_proposed");
@@ -41,8 +42,6 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
   const [loaded, setLoaded] = useState(false);
   const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
-  const [reportSchool, setReportSchool] = useState(schools[0]?.id ?? "");
-  const [reportMsg, setReportMsg] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -76,14 +75,6 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
     setBusy(null);
     if (!r.ok) window.alert("삭제하지 못했어요. 다시 시도해 주세요.");
     reload();
-  }
-
-  async function generateReport() {
-    if (!reportSchool) return;
-    setReportMsg("리포트 생성 중…");
-    const month = new Date().toISOString().slice(0, 7);
-    const r = await fetch("/api/admin/reports/generate", { method: "POST", body: JSON.stringify({ schoolId: reportSchool, month }) });
-    setReportMsg(r.ok ? `생성됨 → /schools/${reportSchool}/reports/${month}` : "생성 실패");
   }
 
   const rows = useMemo(() => {
@@ -134,7 +125,7 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
           ))}
         </div>
         <div className="flex gap-2 flex-wrap items-center">
-          <select value={schoolFilter} onChange={(e) => setSchoolFilter(e.target.value)} className="h-9 rounded-lg border border-line bg-white px-2.5 text-sm min-w-[180px]">
+          <select value={schoolFilter} onChange={(e) => setSchoolFilter(e.target.value)} className={`h-9 rounded-lg border bg-white px-2.5 text-sm min-w-[180px] ${schoolFilter ? "border-brand font-medium" : "border-line"}`}>
             <option value="">모든 학교</option>
             {schools.map((s) => (
               <option key={s.id} value={s.id}>{s.name}</option>
@@ -145,18 +136,11 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
             <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="내용·요약·학교·종류 검색" className="h-9 w-full rounded-lg border border-line bg-white pl-8 pr-3 text-sm outline-none focus:border-brand" />
           </label>
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="text-xs text-muted">월간 리포트</span>
-            <select value={reportSchool} onChange={(e) => setReportSchool(e.target.value)} className="h-9 rounded-lg border border-line bg-white px-2.5 text-sm max-w-[200px]">
-              {schools.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-            <button type="button" onClick={generateReport} className="h-9 px-3 rounded-lg bg-brand text-white text-sm font-bold hover:bg-brand-dark">생성</button>
-          </div>
+          {schoolFilter && <span className="text-xs text-faint">이 학교 신고 {all.filter((s) => s.schoolId === schoolFilter).length}건</span>}
         </div>
-        {reportMsg && <div className="text-xs text-progress-ink">{reportMsg}</div>}
       </div>
+
+      <ReportPanel schools={schools} schoolId={schoolFilter} rows={all} />
 
       {!loaded && <div className="h-40 rounded-xl bg-white border border-line animate-pulse" />}
       {loaded && rows.length === 0 && (

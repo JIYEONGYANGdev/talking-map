@@ -40,6 +40,10 @@ create table if not exists monthly_report (
   resolved integer not null,
   body text not null,
   generated_at timestamptz not null,
+  status text not null default 'draft', -- draft | published (담당자가 공개해야 학부모에게 보임)
+  published_at timestamptz,
+  edited_at timestamptz,
+  edit_count integer not null default 0,
   primary key (school_id, month)
 );
 

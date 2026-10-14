@@ -13,6 +13,7 @@
 
 ## 1. Supabase
 1. 프로젝트 생성 후 **SQL Editor** → `supabase/schema.sql` 내용 전체를 붙여넣고 Run. 테이블 3개(report, signal, monthly_report)가 생긴다.
+   - 10/14 이전에 만든 프로젝트는 `supabase/migrations/2026-10-14_monthly_report_status.sql` 도 한 번 Run (월간 리포트 초안/공개 상태 열 추가). 안 돌리면 리포트 생성은 되지만 상태가 저장되지 않아 초안이 바로 공개로 보인다.
 2. **Project Settings → API** 에서
    - `Project URL` → `SUPABASE_URL`
    - `service_role` 키(secret) → `SUPABASE_SERVICE_KEY` ← 서버에서만 쓴다. 브라우저·깃에 절대 넣지 않는다.

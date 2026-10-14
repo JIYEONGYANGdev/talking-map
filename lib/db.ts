@@ -42,7 +42,16 @@ export type MonthlyReport = {
   resolved: number;
   body: string;
   generatedAt: string;
+  /** AI 초안(draft)은 담당자가 읽고 고친 뒤 공개(published)해야 학부모에게 보인다. 값이 없으면 공개된 것으로 본다(상태 기능 이전 데이터). */
+  status?: "draft" | "published";
+  publishedAt?: string | null;
+  editedAt?: string | null;
+  /** 담당자가 본문을 고쳐 저장한 횟수 */
+  editCount?: number;
 };
+
+/** 학부모에게 보여도 되는 리포트인가. status 가 없던 시절의 리포트는 공개로 친다. */
+export const isPublished = (r: MonthlyReport | null | undefined): r is MonthlyReport => Boolean(r) && r!.status !== "draft";
 
 export type PhotoMediaType = "image/jpeg" | "image/png" | "image/webp";
 
@@ -54,6 +63,8 @@ export interface Store {
   getPhoto(photoUrl: string): Promise<{ data: Buffer; mediaType: PhotoMediaType } | null>;
   saveMonthlyReport(r: MonthlyReport): Promise<void>;
   getMonthlyReport(schoolId: string, month: string): Promise<MonthlyReport | null>;
+  /** 모든 학교·달의 리포트(본문 포함). 공무원 패널의 상태 요약용 — 수십 건 수준이라 전부 돌려준다. */
+  listMonthlyReports(): Promise<MonthlyReport[]>;
   insertReport(r: Report): Promise<void>;
   getReportByToken(token: string): Promise<Report | null>;
   getReport(id: string): Promise<Report | null>;
@@ -121,6 +132,15 @@ const fileStore: Store = {
       return JSON.parse(await fs.readFile(path.join(REPORTS_DIR, `${schoolId}_${month}.json`), "utf8")) as MonthlyReport;
     } catch {
       return null;
+    }
+  },
+  async listMonthlyReports() {
+    try {
+      const names = (await fs.readdir(REPORTS_DIR)).filter((n) => n.endsWith(".json"));
+      const all = await Promise.all(names.map(async (n) => JSON.parse(await fs.readFile(path.join(REPORTS_DIR, n), "utf8")) as MonthlyReport));
+      return all.sort((x, y) => y.month.localeCompare(x.month));
+    } catch {
+      return [];
     }
   },
   async insertReport(r) {
@@ -216,12 +236,24 @@ const supabaseStore: Store = {
     return { data: Buffer.from(await data.arrayBuffer()), mediaType: MT_BY_EXT[name.split(".").pop() ?? ""] ?? "image/jpeg" };
   },
   async saveMonthlyReport(r) {
-    const { error } = await supa().from("monthly_report").upsert(toRow(r), { onConflict: "school_id,month" });
+    let { error } = await supa().from("monthly_report").upsert(toRow(r), { onConflict: "school_id,month" });
+    if (error && /column/i.test(error.message)) {
+      // supabase/migrations/2026-10-14_monthly_report_status.sql 을 아직 안 돌린 경우: 상태 열 없이 저장하고 경고만 남긴다(그 리포트는 공개로 보인다)
+      console.warn("[db] monthly_report 에 status 열이 없습니다. 마이그레이션을 실행하세요:", error.message);
+      const { status: _s, publishedAt: _p, editedAt: _e, editCount: _c, ...legacy } = r;
+      void _s; void _p; void _e; void _c;
+      ({ error } = await supa().from("monthly_report").upsert(toRow(legacy), { onConflict: "school_id,month" }));
+    }
     if (error) throw error;
   },
   async getMonthlyReport(schoolId, month) {
     const { data } = await supa().from("monthly_report").select("*").eq("school_id", schoolId).eq("month", month).maybeSingle();
     return fromRow<MonthlyReport>(data);
+  },
+  async listMonthlyReports() {
+    const { data, error } = await supa().from("monthly_report").select("*").order("month", { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map((r) => fromRow<MonthlyReport>(r)!) as MonthlyReport[];
   },
   async insertReport(r) {
     const { error } = await supa().from("report").insert(toRow(r));
