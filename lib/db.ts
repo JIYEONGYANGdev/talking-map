@@ -62,6 +62,8 @@ export interface Store {
   getSignal(id: string): Promise<Signal | null>;
   getSignalByReport(reportId: string): Promise<Signal | null>;
   listSignals(filter?: { status?: Status; schoolId?: string }): Promise<Signal[]>;
+  /** 신호 하나와 그 신고·사진을 함께 지운다(시연 데이터 정리용, 공무원 인증 뒤에만). 되돌릴 수 없다. 없으면 false */
+  deleteSignal(id: string): Promise<boolean>;
 }
 
 // --- JSON 파일 어댑터 ---
@@ -157,6 +159,17 @@ const fileStore: Store = {
     if (filter?.schoolId) list = list.filter((s) => s.schoolId === filter.schoolId);
     return list.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   },
+  async deleteSignal(id) {
+    const db = await loadFile();
+    const sig = db.signals.find((s) => s.id === id);
+    if (!sig) return false;
+    const report = db.reports.find((r) => r.id === sig.reportId);
+    db.signals = db.signals.filter((s) => s.id !== id);
+    db.reports = db.reports.filter((r) => r.id !== sig.reportId);
+    await saveFile(db);
+    if (report?.photoUrl) await fs.rm(path.join(PHOTOS_DIR, safePhotoName(report.photoUrl)), { force: true });
+    return true;
+  },
 };
 
 // --- Supabase 어댑터 (supabase/schema.sql 과 컬럼명 일치) ---
@@ -251,6 +264,19 @@ const supabaseStore: Store = {
     const { data, error } = await q;
     if (error) throw error;
     return (data ?? []).map((r) => fromRow<Signal>(r)!) as Signal[];
+  },
+  async deleteSignal(id) {
+    const c = supa();
+    const sig = await this.getSignal(id);
+    if (!sig) return false;
+    const report = await this.getReport(sig.reportId);
+    // signal 이 report 를 참조하므로 순서대로
+    let { error } = await c.from("signal").delete().eq("id", id);
+    if (error) throw error;
+    ({ error } = await c.from("report").delete().eq("id", sig.reportId));
+    if (error) throw error;
+    if (report?.photoUrl) await c.storage.from(PHOTO_BUCKET).remove([safePhotoName(report.photoUrl)]);
+    return true;
   },
 };
 

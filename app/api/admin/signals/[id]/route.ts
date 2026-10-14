@@ -42,3 +42,12 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   const updated = await store.updateSignal(id, patch);
   return Response.json(updated);
 }
+
+/** 신호 삭제(시연 데이터 정리용). 신고 글·사진도 함께 지우며 되돌릴 수 없다. */
+export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+  if (!(await isAdmin())) return Response.json({ error: "unauthorized" }, { status: 401 });
+  const { id } = await ctx.params;
+  const ok = await store.deleteSignal(id);
+  if (!ok) return Response.json({ error: "not found" }, { status: 404 });
+  return Response.json({ ok: true, id });
+}

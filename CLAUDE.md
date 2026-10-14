@@ -23,7 +23,7 @@
 - 홈 우측 상단 지역 표시(동 · 양주시)를 누르면 동네 시트(components/RegionSheet.tsx): 현재 지역 양주시 + 학교가 있는 법정동·읍·면 칩(3열, 학교 수 표시) + "현재는 양주시에서만 서비스, 추후 확대" 문구. 칩을 누르면 SchoolPicker 가 그 동네 학교만 보여준다(`dong` prop). 동은 School.dong(지번주소에서 load-data 가 추출, 시연 학교는 옥정동).
 - 지도 페이지는 화면 높이에 고정(지도 flex + 바텀시트 내부 스크롤). 범례 칩을 누르면 현재 지도 중심에서 가장 가까운 해당 항목으로 날아가 말풍선을 열고(SchoolMap `focus`/`onViewChange`), 목록 항목·지도 점을 누르면 그 위치로 이동.
 - 스플래시(components/Splash.tsx)는 현재 꺼져 있음(`SPLASH_ENABLED=false`, 시연 영상에 따로 붙임). 켜면 주소 `/` 로 들어올 때마다 1.6초(`HOLD_UNTIL_TAP=true` 면 탭할 때까지). 깊은 주소(/reports/:token 등)로 진입하면 안 뜨고, 앱 안 탭 이동에서도 다시 안 뜸. 공무원 화면에는 없음.
-- 공무원 /admin(데스크톱 기준, 최대 1152px): 지표 4개(확인 대기·처리 중·이달 고쳐짐·신고→첫 조치 중앙값) → 도구 줄(상태 탭+건수, 학교 필터, 검색, 월간 리포트 생성) → 카드(사진 | 신고 글·AI 요약·이유·근거·좌표 보정 | 학교·종류·기관 선택 + 확정/고쳐짐/해당 없음). 쓰기는 PATCH /api/admin/signals/:id 하나.
+- 공무원 /admin(데스크톱 기준, 최대 1152px): 지표 4개(확인 대기·처리 중·이달 고쳐짐·신고→첫 조치 중앙값) → 도구 줄(상태 탭+건수, 학교 필터, 검색, 월간 리포트 생성) → 카드(사진 | 신고 글·AI 요약·이유·근거·좌표 보정 | 학교·종류·기관 선택 + 확정/고쳐짐/해당 없음). 쓰기는 PATCH /api/admin/signals/:id 하나(상태·종류·기관·좌표). 시연 데이터 정리용 DELETE /api/admin/signals/:id 는 신호+신고+사진을 함께 지움(화면 버튼 없음, curl 로만).
 
 ## 저장소
 - SUPABASE_URL 없으면 data/db.json 파일 저장소(로컬 시연용). Vercel 배포 시 Supabase 필수(supabase/schema.sql: report, signal, monthly_report). 월간 리포트도 store 를 통해 저장(파일 or 테이블). 배포 절차는 docs/deploy.md.
