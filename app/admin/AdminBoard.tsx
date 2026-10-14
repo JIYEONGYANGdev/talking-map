@@ -67,6 +67,17 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
     reload();
   }
 
+  /** 신호 삭제: 신고 글·사진까지 지우고 되돌릴 수 없어 확인창을 한 번 거친다 (시연 데이터·오접수 정리용) */
+  async function remove(s: Row) {
+    const head = (s.maskedText || s.aiSummary || "").slice(0, 40);
+    if (!window.confirm(`이 신고를 삭제할까요?\n"${head}"\n\n신고 글·사진이 함께 지워지고 되돌릴 수 없습니다.`)) return;
+    setBusy(s.id);
+    const r = await fetch(`/api/admin/signals/${s.id}`, { method: "DELETE" });
+    setBusy(null);
+    if (!r.ok) window.alert("삭제하지 못했어요. 다시 시도해 주세요.");
+    reload();
+  }
+
   async function generateReport() {
     if (!reportSchool) return;
     setReportMsg("리포트 생성 중…");
@@ -215,6 +226,9 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
                   {s.status === "confirmed" && <Btn onClick={() => patch(s.id, { action: "resolve" })} busy={busy === s.id} primary tone="done">고쳐짐 처리</Btn>}
                   {s.status !== "dismissed" && s.status !== "resolved" && <Btn onClick={() => patch(s.id, { action: "dismiss" })} busy={busy === s.id}>해당 없음</Btn>}
                   {(s.status === "dismissed" || s.status === "resolved") && <Btn onClick={() => patch(s.id, { action: "confirm" })} busy={busy === s.id}>다시 처리 중으로</Btn>}
+                  <button type="button" onClick={() => remove(s)} disabled={busy === s.id} className="mt-1 self-end text-xs text-muted underline underline-offset-2 hover:text-danger disabled:opacity-50">
+                    삭제
+                  </button>
                 </div>
               </div>
             </div>
