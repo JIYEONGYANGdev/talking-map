@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Sparkle from "@/components/Sparkle";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -130,9 +131,12 @@ export default function SchoolMapClient({ school, schools }: { school: School; s
         )}
         {data && data.signals.length === 0 && <p className="text-sm text-muted">아직 확정된 신호가 없어요. 첫 신고가 지도의 첫 점이 됩니다.</p>}
 
-        <div className="flex gap-2 pt-1">
-          <Link href={`/report?school=${school.id}`} className="flex-1 h-12 rounded-2xl bg-brand text-white font-bold flex items-center justify-center active:bg-brand-dark">이 학교 주변 신고하기</Link>
-          <Link href={`/schools/${school.id}/reports/${month}`} className="h-12 px-4 rounded-2xl bg-white border border-line font-bold flex items-center justify-center">이번 달 리포트</Link>
+        <div className="flex flex-col gap-2 pt-1">
+          <Link href={`/report?school=${school.id}`} className="h-12 rounded-2xl bg-brand text-white font-bold flex items-center justify-center active:bg-brand-dark">이 학교 주변 신고하기</Link>
+          <Link href={`/schools/${school.id}/reports/${month}`} className="h-12 rounded-2xl bg-white border border-line font-bold flex items-center justify-center gap-1 active:bg-ground-deep">
+            이번 달 AI 요약 리포트
+            <Sparkle />
+          </Link>
         </div>
       </div>
     </div>
