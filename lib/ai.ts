@@ -23,6 +23,8 @@ export type ClassifyInput = {
   photoBase64?: string; // data URL 아님, 순수 base64
   photoMediaType?: "image/jpeg" | "image/png" | "image/webp";
   tappedLatLng?: { lat: number; lng: number } | null;
+  /** 신고자가 폼에서 고른 학교. 위치 설명의 기준점으로 쓰라고 알려 준다(학교 연결 자체는 서버가 이 값을 우선). */
+  selectedSchool?: School | null;
   schools: School[];
   agencies: Agency[];
 };
@@ -61,6 +63,7 @@ export async function classifyReport(input: ClassifyInput): Promise<ClassifyOutp
       `## 신고자가 지도에서 찍은 위치\n${
         input.tappedLatLng ? `${input.tappedLatLng.lat}, ${input.tappedLatLng.lng}` : "(없음)"
       }`,
+      `## 신고자가 고른 학교\n${input.selectedSchool ? `${input.selectedSchool.id}: ${input.selectedSchool.name} — 특별한 근거가 없으면 이 학교로 연결하고, 위치는 이 학교를 기준으로 설명할 것` : "(없음)"}`,
       `## 양주시 초등학교 목록 (이 목록 밖의 학교는 쓰지 말 것)\n${schoolList}`,
       `## 담당 기관 표 (이 표 밖의 기관·법 근거는 쓰지 말 것)\n${agencyList}`,
     ].join("\n\n"),

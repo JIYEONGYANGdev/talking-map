@@ -15,6 +15,7 @@ const MAX_TEXT_CHARS = 2000;
  */
 export async function POST(req: Request) {
   let text = "";
+  let schoolId: string | undefined;
   let address: string | undefined;
   let lat: number | undefined;
   let lng: number | undefined;
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
   if (ct.includes("multipart/form-data")) {
     const fd = await req.formData();
     text = String(fd.get("text") ?? "");
+    schoolId = fd.get("schoolId") ? String(fd.get("schoolId")) : undefined;
     address = fd.get("address") ? String(fd.get("address")) : undefined;
     lat = fd.get("lat") ? Number(fd.get("lat")) : undefined;
     lng = fd.get("lng") ? Number(fd.get("lng")) : undefined;
@@ -40,6 +42,7 @@ export async function POST(req: Request) {
   } else {
     const body = await req.json();
     text = String(body.text ?? "");
+    schoolId = typeof body.schoolId === "string" ? body.schoolId : undefined;
     address = body.address;
     lat = body.lat;
     lng = body.lng;
@@ -79,6 +82,8 @@ export async function POST(req: Request) {
   }
 
   const [schools, agencies] = await Promise.all([getSchools(), getAgencies()]);
+  // 신고자가 폼에서 고른 학교(목록에 있는 것만). AI 는 이 학교를 전제로 위치·종류를 정리하고, 학교 연결은 이 값이 우선한다.
+  const chosen = schools.find((s) => s.id === schoolId) ?? null;
   let signal: Signal;
   try {
     const out = await classifyReport({
@@ -87,15 +92,17 @@ export async function POST(req: Request) {
       photoBase64,
       photoMediaType,
       tappedLatLng: lat != null && lng != null ? { lat, lng } : null,
+      selectedSchool: chosen,
       schools,
       agencies,
     });
-    const school = schools.find((s) => s.id === out.schoolId);
+    const resolvedSchoolId = chosen?.id ?? out.schoolId;
+    const school = schools.find((s) => s.id === resolvedSchoolId);
     const agency = agencies.find((a) => a.id === out.agencyId);
     signal = {
       id: randomUUID(),
       reportId: report.id,
-      schoolId: out.schoolId,
+      schoolId: resolvedSchoolId,
       category: out.category,
       // 좌표: 신고자가 찍은 위치 > (없으면) 학교 중심점(low 로 표시)
       lat: lat ?? school?.lat ?? null,
@@ -115,7 +122,7 @@ export async function POST(req: Request) {
     signal = {
       id: randomUUID(),
       reportId: report.id,
-      schoolId: null,
+      schoolId: chosen?.id ?? null,
       category: "기타",
       lat: lat ?? null,
       lng: lng ?? null,

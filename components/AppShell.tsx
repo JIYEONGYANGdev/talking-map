@@ -1,7 +1,15 @@
 "use client";
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Splash from "@/components/Splash";
+
+/** 화면이 바뀌면 맨 위로. 모바일 사파리에서 이전 화면의 스크롤 위치가 남아 제목이 주소창에 가리는 일을 막는다. */
+function useScrollTopOnNavigate(pathname: string) {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+  }, [pathname]);
+}
 
 /**
  * 화면 틀. 학부모 화면은 모바일 폭(최대 430px) + 하단 탭 3개(홈·지도·내 신고),
@@ -10,6 +18,7 @@ import Splash from "@/components/Splash";
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
   const isAdmin = pathname.startsWith("/admin");
+  useScrollTopOnNavigate(pathname);
 
   if (isAdmin) {
     return (

@@ -45,6 +45,7 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
     setError(null);
     const fd = new FormData();
     fd.set("text", text);
+    if (school) fd.set("schoolId", school.id); // 3단계에서 고른 학교. 서버는 이 값을 AI 추정보다 우선한다
     if (picked) {
       fd.set("lat", String(picked.lat));
       fd.set("lng", String(picked.lng));
