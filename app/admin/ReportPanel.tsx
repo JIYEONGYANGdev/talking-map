@@ -67,6 +67,10 @@ export default function ReportPanel({ schools, schoolId, rows }: { schools: Scho
     const r = await fetch("/api/admin/reports/generate", { method: "POST", body: JSON.stringify({ schoolId: school.id, month }) });
     setBusy(false);
     if (!r.ok) setError("초안을 만들지 못했어요. 잠시 뒤 다시 시도해 주세요.");
+    else {
+      const d = (await r.json()) as { fallback?: string | null };
+      if (d.fallback) setError(d.fallback === "credits" ? "AI 크레딧이 소진되어 숫자와 종류만으로 쓴 틀 초안을 만들었어요. 내용을 확인하고 고쳐서 공개해 주세요." : "AI 응답을 받지 못해 틀 초안을 만들었어요. 내용을 확인하고 고쳐서 공개해 주세요.");
+    }
     setVersion((v) => v + 1);
   }
 

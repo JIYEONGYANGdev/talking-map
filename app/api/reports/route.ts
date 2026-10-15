@@ -2,6 +2,7 @@ import { randomBytes, randomUUID } from "crypto";
 import { getAgencies, getSchools, store, storeKind } from "@/lib/db";
 import { maskText } from "@/lib/mask";
 import { classifyReport } from "@/lib/ai";
+import { aiFailureKind, fallbackClassify, type AiFailureKind } from "@/lib/fallback";
 import type { Report, Signal } from "@/lib/types";
 
 // 사진 포함 Claude 호출이 10초를 넘길 수 있다 (서버리스 함수 제한 상향)
@@ -85,6 +86,7 @@ export async function POST(req: Request) {
   // 신고자가 폼에서 고른 학교(목록에 있는 것만). AI 는 이 학교를 전제로 위치·종류를 정리하고, 학교 연결은 이 값이 우선한다.
   const chosen = schools.find((s) => s.id === schoolId) ?? null;
   let signal: Signal;
+  let aiFailed: AiFailureKind | null = null;
   try {
     const out = await classifyReport({
       maskedText: report.maskedText,
@@ -118,19 +120,22 @@ export async function POST(req: Request) {
       updatedAt: new Date().toISOString(),
     };
   } catch (e) {
-    // AI 실패 시에도 신고는 남기고 공무원 검토로 보낸다
+    // AI 실패(크레딧 소진·장애) 시에도 신고는 남긴다. 키워드 규칙으로 임시 분류하고 '직접 검토'(received)로 보낸다 — lib/fallback.ts
+    aiFailed = aiFailureKind(e);
+    console.error(`[reports] AI 실패(${aiFailed}):`, e instanceof Error ? e.message : e);
+    const fb = fallbackClassify(report.maskedText, agencies);
     signal = {
       id: randomUUID(),
       reportId: report.id,
       schoolId: chosen?.id ?? null,
-      category: "기타",
-      lat: lat ?? null,
-      lng: lng ?? null,
+      category: fb.category,
+      lat: lat ?? chosen?.lat ?? null,
+      lng: lng ?? chosen?.lng ?? null,
       locationConfidence: lat != null ? "high" : "low",
-      agencyId: null,
-      legalBasis: null,
-      aiSummary: "(AI 분류 실패 — 공무원 직접 검토)",
-      aiReason: String(e instanceof Error ? e.message : e),
+      agencyId: fb.agencyId,
+      legalBasis: fb.legalBasis,
+      aiSummary: fb.summary,
+      aiReason: fb.reason,
       status: "received",
       updatedAt: new Date().toISOString(),
     };
@@ -143,5 +148,5 @@ export async function POST(req: Request) {
     return Response.json({ error: "storage", detail: msg, store: storeKind }, { status: 500 });
   }
 
-  return Response.json({ token: report.token, signalId: signal.id, status: signal.status });
+  return Response.json({ token: report.token, signalId: signal.id, status: signal.status, aiFailed });
 }

@@ -2,6 +2,7 @@ import { isAdmin } from "@/lib/auth";
 import { getSchools, store } from "@/lib/db";
 import { reportSignals } from "@/lib/report-server";
 import { writeMonthlyReport } from "@/lib/ai";
+import { aiFailureKind, fallbackReportBody, type AiFailureKind } from "@/lib/fallback";
 
 // Claude 호출 포함 — 서버리스 기본 제한(10초)보다 길 수 있다
 export const maxDuration = 60;
@@ -15,7 +16,16 @@ export async function POST(req: Request) {
     return Response.json({ error: "schoolId and month (YYYY-MM) required" }, { status: 400 });
   }
   const signals = await reportSignals(schoolId, month);
-  const body = await writeMonthlyReport(school, month, signals);
+  // AI 를 못 쓰면(크레딧 소진·장애) 숫자·종류만으로 쓴 틀 문장을 초안으로 둔다 — 담당자가 고쳐서 공개한다
+  let body: string;
+  let fallback: AiFailureKind | null = null;
+  try {
+    body = await writeMonthlyReport(school, month, signals);
+  } catch (e) {
+    fallback = aiFailureKind(e);
+    console.error(`[reports/generate] AI 실패(${fallback}):`, e instanceof Error ? e.message : e);
+    body = fallbackReportBody(school, month, signals);
+  }
   // 새로 받은 초안은 공개 전 상태로 돌아간다(이미 공개된 달을 다시 생성해도). 담당자가 읽고 공개해야 학부모에게 보인다.
   const report = {
     schoolId,
@@ -31,5 +41,5 @@ export async function POST(req: Request) {
   };
   // 파일 저장소면 data/reports/<school>_<month>.json, Supabase 면 monthly_report 테이블
   await store.saveMonthlyReport(report);
-  return Response.json(report);
+  return Response.json({ ...report, fallback });
 }

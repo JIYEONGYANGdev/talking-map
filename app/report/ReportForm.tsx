@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { rememberReport, rememberSchool } from "@/lib/local";
+import { AI_FAILURE_NOTICE, type AiFailureKind } from "@/lib/fallback";
 import type { School } from "@/lib/types";
 
 const SchoolMap = dynamic(() => import("@/components/SchoolMap"), { ssr: false });
@@ -23,6 +24,8 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [picked, setPicked] = useState<{ lat: number; lng: number } | null>(null);
   const [busy, setBusy] = useState(false);
+  // AI 를 못 써서 글·사진만 접수된 경우: 안내창을 보여 주고 "확인"을 누르면 진행 확인 화면으로
+  const [notice, setNotice] = useState<{ token: string; kind: AiFailureKind } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const school = useMemo(() => schools.find((s) => s.id === schoolId) ?? schools[0], [schools, schoolId]);
@@ -57,9 +60,13 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
       setError("접수에 실패했어요. 잠시 후 다시 시도해 주세요.");
       return;
     }
-    const out = (await r.json()) as { token: string };
+    const out = (await r.json()) as { token: string; aiFailed?: AiFailureKind | null };
     rememberReport({ token: out.token, at: new Date().toISOString(), text: text.slice(0, 60), schoolId: school?.id });
     if (school) rememberSchool(school.id);
+    if (out.aiFailed) {
+      setNotice({ token: out.token, kind: out.aiFailed });
+      return;
+    }
     router.push(`/reports/${out.token}?new=1`);
   }
 
@@ -67,6 +74,22 @@ export default function ReportForm({ schools, defaultSchoolId }: { schools: Scho
 
   return (
     <div className="flex flex-col min-h-screen">
+      {notice && (
+        <div className="fixed inset-0 z-[1500] bg-ink/40 flex items-end sm:items-center justify-center p-5" role="alertdialog" aria-modal="true" aria-labelledby="ai-notice-title">
+          <div className="w-full max-w-[390px] bg-white rounded-2xl p-5 flex flex-col gap-3">
+            <div className="flex items-center gap-2.5">
+              <span className="w-9 h-9 rounded-full bg-priority-soft text-priority-ink flex items-center justify-center shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01" /><path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg>
+              </span>
+              <div id="ai-notice-title" className="font-bold text-[16px]">신고는 접수됐어요</div>
+            </div>
+            <p className="text-[14px] leading-relaxed text-ink">{AI_FAILURE_NOTICE[notice.kind]}</p>
+            <button type="button" onClick={() => router.push(`/reports/${notice.token}?new=1`)} className="h-12 rounded-xl bg-brand text-white font-bold text-[15px] active:bg-brand-dark">
+              확인
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col gap-4 px-5 pt-4 flex-1">
         <div className="flex items-center justify-between">
           {back ? (

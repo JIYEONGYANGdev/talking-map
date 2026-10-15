@@ -71,7 +71,8 @@ export default function ReportEditor({ schoolId, schoolName, month }: { schoolId
     setMsg(null);
     const r = await fetch("/api/admin/reports/generate", { method: "POST", body: JSON.stringify({ schoolId, month }) });
     setBusy(null);
-    setMsg(r.ok ? "AI 초안을 새로 받았어요." : "초안을 만들지 못했어요. 잠시 뒤 다시 시도해 주세요.");
+    const d = r.ok ? ((await r.json()) as { fallback?: string | null }) : null;
+    setMsg(!r.ok ? "초안을 만들지 못했어요. 잠시 뒤 다시 시도해 주세요." : d?.fallback ? (d.fallback === "credits" ? "AI 크레딧이 소진되어 틀 초안을 만들었어요. 고쳐서 공개해 주세요." : "AI 응답을 받지 못해 틀 초안을 만들었어요. 고쳐서 공개해 주세요.") : "AI 초안을 새로 받았어요.");
     setVersion((v) => v + 1);
   }
 
