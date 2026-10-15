@@ -55,6 +55,7 @@ export async function classifyReport(input: ClassifyInput): Promise<ClassifyOutp
       source: { type: "base64", media_type: input.photoMediaType, data: input.photoBase64 },
     });
   }
+  // 신고마다 바뀌는 부분만 user 메시지에. 학교 목록·기관 표(약 3,000토큰)는 system 으로 올려 프롬프트 캐시에 태운다
   content.push({
     type: "text",
     text: [
@@ -64,8 +65,6 @@ export async function classifyReport(input: ClassifyInput): Promise<ClassifyOutp
         input.tappedLatLng ? `${input.tappedLatLng.lat}, ${input.tappedLatLng.lng}` : "(없음)"
       }`,
       `## 신고자가 고른 학교\n${input.selectedSchool ? `${input.selectedSchool.id}: ${input.selectedSchool.name} — 특별한 근거가 없으면 이 학교로 연결하고, 위치는 이 학교를 기준으로 설명할 것` : "(없음)"}`,
-      `## 양주시 초등학교 목록 (이 목록 밖의 학교는 쓰지 말 것)\n${schoolList}`,
-      `## 담당 기관 표 (이 표 밖의 기관·법 근거는 쓰지 말 것)\n${agencyList}`,
     ].join("\n\n"),
   });
 
@@ -73,7 +72,20 @@ export async function classifyReport(input: ClassifyInput): Promise<ClassifyOutp
     model: MODEL,
     // 적응형 사고(thinking) 토큰도 max_tokens 에 포함되므로 넉넉히 잡는다
     max_tokens: 4096,
-    system: CLASSIFY_SYSTEM,
+    // 프롬프트 캐싱: 렌더 순서가 tools → system → messages 라 마지막 system 블록의 breakpoint 가 도구 정의와 규칙·표를 한 번에 캐시한다.
+    // 학교·기관 데이터는 JSON 스냅샷이라 요청마다 바이트가 같다(순서 포함). Sonnet 5.5 최소 캐시 길이 512토큰 ≫ 충족.
+    // TTL 1h: 시연·실사용 모두 신고 간격이 5분을 넘기 쉬워 1시간짜리로. 쓰기 2배, 읽기 0.1배 → 2건째부터 이득.
+    system: [
+      { type: "text", text: CLASSIFY_SYSTEM },
+      {
+        type: "text",
+        text: [
+          `## 양주시 초등학교 목록 (이 목록 밖의 학교는 쓰지 말 것)\n${schoolList}`,
+          `## 담당 기관 표 (이 표 밖의 기관·법 근거는 쓰지 말 것)\n${agencyList}`,
+        ].join("\n\n"),
+        cache_control: { type: "ephemeral", ttl: "1h" },
+      },
+    ],
     tools: [
       {
         name: "submit_classification",

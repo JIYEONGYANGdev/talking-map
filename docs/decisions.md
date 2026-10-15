@@ -20,3 +20,4 @@
 | 2026-10-16 | 학부모 하단 탭에 공무원 진입점 "시청" 추가 (시연용) | 심사 시연에서 공무원 화면으로 바로 이동. 이름은 "기관·지자체"보다 처리 주체가 바로 읽히는 "시청" | `components/AppShell.tsx` `SHOW_ADMIN_TAB` — 실서비스에는 false |
 | 2026-10-16 | 배포본 ADMIN_PASSWORD 는 환경변수 없이 기본값 사용 (시연 기간) | 비밀번호 자동 입력과 맞춤 | 실서비스 전환 때 Vercel 환경변수 설정 + `DEMO_PASSWORD` 비움 |
 | 2026-10-16 | AI 를 못 쓸 때도 한 바퀴가 돌게: 신고는 저장 + 안내창, 키워드 규칙 임시 분류(상태 received), 리포트는 틀 문장 초안 | 시연 중 크레딧 소진·장애로 심사위원 신고가 실패하면 안 됨 | `lib/fallback.ts`, `/api/reports` 응답 `aiFailed`, `/api/admin/reports/generate` 응답 `fallback` |
+| 2026-10-16 | 신고 분류 프롬프트 캐싱 (학교 목록·기관 표 → system 블록, TTL 1h) | 입력 ~3,600토큰 중 ~3,000이 고정 표. 2건째부터 입력 비용 약 1/4 | `lib/ai.ts classifyReport`. 끄려면 `cache_control` 줄 삭제 |

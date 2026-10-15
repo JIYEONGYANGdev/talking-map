@@ -49,6 +49,7 @@ npm run dev / npm run load-data / npm run load-accidents / npm run seed (모의 
 - `.claude/launch.json` 의 dev 는 `zsh -c "npm run dev"` 로 띄운다(Turbopack 자식 node 도 22 여야 함). `next dev` 와 `next build` 를 동시에 돌리지 말 것(.next 공유). Turbopack 패닉에 `internal/modules/cjs/loader.js` 가 보이면 Node 14 워커 → PATH 고친 뒤 `rm -rf .next`.
 - git 커밋 작성자는 GitHub 계정에 연결된 이메일이어야 한다(저장소 로컬 config 에 `82949221+JIYEONGYANGdev@users.noreply.github.com` 설정, 10/13). 호스트명 이메일(`@…MacBookAir.local`)로 커밋하면 Vercel 이 "Deployment was blocked" 로 배포를 막는다. 배포 여부는 `gh api repos/JIYEONGYANGdev/talking-map/commits/<sha>/status` 로 확인.
 - `lib/ai.ts`: Sonnet 5.5 는 강제 tool_choice 를 거부 → auto + strict. 조직 범위 키는 ANTHROPIC_WORKSPACE_ID 헤더 필요.
+- `lib/ai.ts` 신고 분류는 프롬프트 캐싱(10/16): 학교 목록·기관 표를 system 두 번째 블록에 두고 `cache_control: {ephemeral, ttl: "1h"}`. 신고마다 바뀌는 글·주소·위치·고른 학교만 user 메시지. 서버 로그 `[ai-usage] … cache_write/cache_read` 로 확인. 학교·기관 JSON 을 바꾸면 캐시가 다시 써진다(정상).
 
 ## 결정 기록 (항상)
 제품·운영에 영향을 주는 결정(스위치 켜고 끄기, 데이터 규칙, 시연용 임시 조치 포함)을 하면 docs/decisions.md 표에 한 줄 추가한다. 되돌리면 "되돌림"으로 표시. 환경변수 값 등 민감정보는 적지 않는다. 인수인계 현황은 docs/handoff.md.
