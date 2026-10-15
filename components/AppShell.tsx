@@ -4,6 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Splash from "@/components/Splash";
 
+/** 시연용: 학부모 하단 탭에 공무원 화면 진입점 "시청"을 넣는다. 실서비스에는 없어야 하므로 스위치로. docs/decisions.md 2026-10-16 */
+const SHOW_ADMIN_TAB = true;
+
 /** 화면이 바뀌면 맨 위로. 모바일 사파리에서 이전 화면의 스크롤 위치가 남아 제목이 주소창에 가리는 일을 막는다. */
 function useScrollTopOnNavigate(pathname: string) {
   useEffect(() => {
@@ -90,8 +93,22 @@ function BottomTab({ active }: { active: string }) {
       ),
     },
   ];
+  if (SHOW_ADMIN_TAB)
+    items.push({
+      key: "admin",
+      href: "/admin",
+      label: "시청",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M3 21h18" />
+          <path d="M5 21V9l7-5 7 5v12" />
+          <path d="M9 21v-5h6v5" />
+          <path d="M9 12h.01M15 12h.01" />
+        </svg>
+      ),
+    });
   return (
-    <nav aria-label="주요 메뉴" className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[84px] bg-white border-t border-line grid grid-cols-3 px-2 pt-2 pb-5 z-40">
+    <nav aria-label="주요 메뉴" className={`fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[84px] bg-white border-t border-line grid ${items.length === 4 ? "grid-cols-4" : "grid-cols-3"} px-2 pt-2 pb-5 z-40`}>
       {items.map((it) => {
         const on = it.key === active;
         return (

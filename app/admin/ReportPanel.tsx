@@ -77,15 +77,17 @@ export default function ReportPanel({ schools, schoolId, rows }: { schools: Scho
     const drafts = list.filter((r) => r.status === "draft").length;
     const published = list.filter((r) => r.status !== "draft").length;
     return (
-      <div className="bg-white border border-line rounded-xl px-5 py-3 flex items-center gap-3 text-sm">
-        <DocIcon />
-        <span className="font-bold">{Number(m.slice(5))}월 리포트</span>
+      <div className="bg-white border border-line rounded-xl px-4 sm:px-5 py-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
+        <span className="flex items-center gap-2 shrink-0">
+          <DocIcon />
+          <span className="font-bold">{Number(m.slice(5))}월 리포트</span>
+        </span>
         {reports ? (
-          <span className="text-muted">초안 <b className="text-priority-ink">{drafts}</b> · 공개 <b className="text-done-ink">{published}</b> · 미생성 <b className="text-ink">{Math.max(schools.length - drafts - published, 0)}</b></span>
+          <span className="text-muted whitespace-nowrap">초안 <b className="text-priority-ink">{drafts}</b> · 공개 <b className="text-done-ink">{published}</b> · 미생성 <b className="text-ink">{Math.max(schools.length - drafts - published, 0)}</b></span>
         ) : (
           <span className="text-muted">불러오는 중…</span>
         )}
-        <span className="ml-auto text-xs text-faint">학교를 고르면 그 학교 리포트를 만들고 공개할 수 있어요</span>
+        <span className="basis-full sm:basis-auto sm:ml-auto text-xs text-faint leading-relaxed">학교를 고르면 그 학교 리포트를 만들고 공개할 수 있어요</span>
       </div>
     );
   }
@@ -94,7 +96,7 @@ export default function ReportPanel({ schools, schoolId, rows }: { schools: Scho
   const badge = !report ? { cls: "bg-review-soft text-muted", dot: "bg-faint", label: "아직 만들지 않음" } : report.status === "draft" ? { cls: "bg-priority-soft text-priority-ink", dot: "bg-priority", label: "초안 — 공개 전" } : { cls: "bg-done-soft text-done-ink", dot: "bg-done", label: "공개됨" };
 
   return (
-    <div className="bg-white border border-line-strong rounded-xl px-5 py-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] items-center">
+    <div className="bg-white border border-line-strong rounded-xl px-4 sm:px-5 py-4 grid gap-4 lg:gap-5 lg:grid-cols-[minmax(0,1fr)_300px] items-center">
       <div className="flex flex-col gap-2.5 min-w-0">
         <div className="flex items-center gap-2.5 flex-wrap">
           <DocIcon />
@@ -109,7 +111,7 @@ export default function ReportPanel({ schools, schoolId, rows }: { schools: Scho
             {badge.label}
           </span>
         </div>
-        <div className="flex gap-5 flex-wrap text-[13px] text-muted">
+        <div className="flex gap-x-4 gap-y-1 flex-wrap text-[13px] text-muted">
           <span>리포트에 들어갈 신호 <b className="text-ink">{counts.total}건</b></span>
           <span>처리 중 <b className="text-progress-ink">{counts.inProgress}</b></span>
           <span>고쳐짐 <b className="text-done-ink">{counts.resolved}</b></span>

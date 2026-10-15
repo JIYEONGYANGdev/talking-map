@@ -7,6 +7,9 @@ import { CATEGORIES, type Agency, type School, type Signal, type Status } from "
 
 const SchoolMap = dynamic(() => import("@/components/SchoolMap"), { ssr: false });
 
+/** 시연 중 실수 방지: false 면 카드의 "삭제"가 보이기만 하고 눌리지 않는다(API 는 그대로 열려 있어 curl 로는 가능). docs/decisions.md 2026-10-16 */
+const DELETE_ENABLED = false;
+
 /** 학교도 좌표도 없을 때 지도 중심(양주시청 부근) */
 const YANGJU_CENTER = { lat: 37.7853, lng: 127.0459 };
 
@@ -210,7 +213,7 @@ export default function AdminBoard({ schools, agencies }: { schools: School[]; a
                   {s.status === "confirmed" && <Btn onClick={() => patch(s.id, { action: "resolve" })} busy={busy === s.id} primary tone="done">고쳐짐 처리</Btn>}
                   {s.status !== "dismissed" && s.status !== "resolved" && <Btn onClick={() => patch(s.id, { action: "dismiss" })} busy={busy === s.id}>해당 없음</Btn>}
                   {(s.status === "dismissed" || s.status === "resolved") && <Btn onClick={() => patch(s.id, { action: "confirm" })} busy={busy === s.id}>다시 처리 중으로</Btn>}
-                  <button type="button" onClick={() => remove(s)} disabled={busy === s.id} className="mt-1 self-end text-xs text-muted underline underline-offset-2 hover:text-danger disabled:opacity-50">
+                  <button type="button" onClick={() => remove(s)} disabled={!DELETE_ENABLED || busy === s.id} title={DELETE_ENABLED ? undefined : "시연 중에는 꺼 두었어요"} className="mt-1 self-end text-xs text-muted underline underline-offset-2 hover:text-danger disabled:opacity-40 disabled:no-underline disabled:cursor-not-allowed">
                     삭제
                   </button>
                 </div>

@@ -50,6 +50,9 @@ npm run dev / npm run load-data / npm run load-accidents / npm run seed (모의 
 - git 커밋 작성자는 GitHub 계정에 연결된 이메일이어야 한다(저장소 로컬 config 에 `82949221+JIYEONGYANGdev@users.noreply.github.com` 설정, 10/13). 호스트명 이메일(`@…MacBookAir.local`)로 커밋하면 Vercel 이 "Deployment was blocked" 로 배포를 막는다. 배포 여부는 `gh api repos/JIYEONGYANGdev/talking-map/commits/<sha>/status` 로 확인.
 - `lib/ai.ts`: Sonnet 5.5 는 강제 tool_choice 를 거부 → auto + strict. 조직 범위 키는 ANTHROPIC_WORKSPACE_ID 헤더 필요.
 
+## 결정 기록 (항상)
+제품·운영에 영향을 주는 결정(스위치 켜고 끄기, 데이터 규칙, 시연용 임시 조치 포함)을 하면 docs/decisions.md 표에 한 줄 추가한다. 되돌리면 "되돌림"으로 표시. 환경변수 값 등 민감정보는 적지 않는다. 인수인계 현황은 docs/handoff.md.
+
 ## AI 활용 기록 (공모전 평가용)
 docs/ai-usage-log.md 를 계속 갱신한다. **1부 기획 아이템 관점**(서비스 안의 AI: 시민 접점·공무원 업무·신뢰 장치·학부모 소통·측정과 개선·확장 아이디어)과 **2부 개발 과정 관점**(유형 A~G) 둘 다. 기능을 만들거나 바꿀 때 "이 서비스에서 AI 가 하는 일·안 하는 일·안전장치"가 달라지면 1부에, 개발 중 AI 가 사람 대신 해 준 일은 2부에 날짜와 함께 적는다.
 

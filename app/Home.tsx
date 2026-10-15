@@ -13,7 +13,7 @@ import type { School } from "@/lib/types";
  * 시연 녹화용 스위치. true 면 홈 카드에서 글자·그림 부분만 눌러서 이동하고 카드 여백은 반응하지 않는다
  * (사고 배너: "지도에서 보기" 글자 / 숫자 타일: 점·숫자·이름 / 내 신고: 오른쪽 화살표). 녹화가 끝나면 false 로 되돌린다.
  */
-const NARROW_TAP = true;
+const NARROW_TAP = false;
 
 type Summary = { signals: { kind: "priority" | "inprogress" | "resolved" }[]; reviewing: number; accidents: unknown[] };
 
