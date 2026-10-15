@@ -1,7 +1,7 @@
 # 인수인계 — 다른 컴퓨터에서 이어 개발하기 (2026-10-16)
 
 배포본: https://talking-map-2026.vercel.app (main push 시 자동 배포). 상태 확인 `/api/health` 의 `commit` 이 GitHub 최신 커밋과 같으면 반영된 것.
-결정 사항은 [decisions.md](decisions.md), AI 활용 기록은 [ai-usage-log.md](ai-usage-log.md), 배포 절차는 [deploy.md](deploy.md).
+세션 작업 맥락 요약은 [session-notes-2026-10-16.md](session-notes-2026-10-16.md), 결정 사항은 [decisions.md](decisions.md), AI 활용 기록은 [ai-usage-log.md](ai-usage-log.md), 배포 절차는 [deploy.md](deploy.md).
 
 ## 1. git 에 없는 것 (직접 옮겨야 함)
 `.gitignore` 로 제외된 파일이라 clone 해도 없다. **값은 이 문서에 적지 않는다.**
