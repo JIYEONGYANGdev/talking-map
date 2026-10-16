@@ -9,7 +9,7 @@
 | 2026-10-10 | 담당 기관 표를 양주시 실제 과·팀 기준으로 교체 (교통시설팀 추가, 차량관리과·민원여권과 의미 변경) | 조직도 분석 결과 시민안전과는 통학로 업무가 없음 | `data/agencies.json` (백업 `data/agencies.backup-2026-10-10.json`) |
 | 2026-10-10 | 학부모 화면 모바일 전면 개편 + 새 팔레트(센디 자료 톤) | 시안 캔버스 v2 | `app/globals.css @theme`, 시안 https://claude.ai/artifact/PXU2XCjBmBZKm54hxudjT6 |
 | 2026-10-13 | 시연 학교 이름에서 "(시연)" 제거 → "연푸룬초등학교" | 시연 영상 녹화 | `data/schools.json`, `scripts/seed-demo.ts` |
-| 2026-10-13 | 스플래시는 앱에서 끄고 영상에 따로 붙인다 | 화면 사이사이 떠서 녹화 방해 | `components/Splash.tsx` `SPLASH_ENABLED=false` (켜려면 true, `HOLD_UNTIL_TAP=false` 면 1.6초 자동) |
+| 2026-10-13 | ~~스플래시는 앱에서 끄고 영상에 따로 붙인다~~ (되돌림 10/16) | 화면 사이사이 떠서 녹화 방해 | `components/Splash.tsx` `SPLASH_ENABLED=false` (켜려면 true, `HOLD_UNTIL_TAP=false` 면 1.6초 자동) |
 | 2026-10-13 | 홈 카드 클릭 영역을 글자·아이콘만으로 좁힘 (녹화용) | 녹화 중 오터치 방지 | `app/Home.tsx` `NARROW_TAP` — **2026-10-16 되돌림(false)** |
 | 2026-10-13 | 공무원 API 에 신호 삭제 추가 (신고·사진 함께 삭제) | 테스트 신고 정리 | `DELETE /api/admin/signals/:id`, 카드 "삭제" 버튼 |
 | 2026-10-14 | 월간 리포트는 "AI 초안 → 담당자 공개" 2단계. 공개 전 자동 점검 3개 불통과면 공개 불가 | 신고 카드의 확정 원칙을 리포트에도 적용 (시안 10·11) | `app/admin/ReportPanel.tsx`, `app/admin/reports/[schoolId]/[month]/`, `lib/report.ts`. Supabase 는 `supabase/migrations/2026-10-14_monthly_report_status.sql` 필요 |
@@ -21,3 +21,4 @@
 | 2026-10-16 | 배포본 ADMIN_PASSWORD 는 환경변수 없이 기본값 사용 (시연 기간) | 비밀번호 자동 입력과 맞춤 | 실서비스 전환 때 Vercel 환경변수 설정 + `DEMO_PASSWORD` 비움 |
 | 2026-10-16 | AI 를 못 쓸 때도 한 바퀴가 돌게: 신고는 저장 + 안내창, 키워드 규칙 임시 분류(상태 received), 리포트는 틀 문장 초안 | 시연 중 크레딧 소진·장애로 심사위원 신고가 실패하면 안 됨 | `lib/fallback.ts`, `/api/reports` 응답 `aiFailed`, `/api/admin/reports/generate` 응답 `fallback` |
 | 2026-10-16 | 신고 분류 프롬프트 캐싱 (학교 목록·기관 표 → system 블록, TTL 1h) | 입력 ~3,600토큰 중 ~3,000이 고정 표. 2건째부터 입력 비용 약 1/4 | `lib/ai.ts classifyReport`. 끄려면 `cache_control` 줄 삭제 |
+| 2026-10-16 | 스플래시 다시 켬 (1.6초 자동 사라짐, 탭하면 즉시) | 녹화는 끝났고 앱 첫 진입에 소개 화면이 있는 편이 낫다는 요청. 10/13 결정 되돌림 | `components/Splash.tsx` `SPLASH_ENABLED=true`, `HOLD_UNTIL_TAP=false` — 녹화용으로 멈추려면 `HOLD_UNTIL_TAP=true` |

@@ -7,10 +7,10 @@ import Mascot from "@/components/Mascot";
  * 앱 안에서 탭을 오가는 동안은 다시 뜨지 않고(AppShell 이 한 번만 마운트), 진행 확인 링크(/reports/…)처럼 깊은 주소로 들어올 때도 띄우지 않는다.
  * 화면을 가리기만 하고 데이터 로딩은 뒤에서 그대로 진행된다.
  */
-/** 스플래시 켜기/끄기. 시연 영상은 스플래시를 따로 녹화해 붙이기로 해서 10/13 부터 꺼 둔다(false 면 아무것도 그리지 않음) */
-const SPLASH_ENABLED = false;
+/** 스플래시 켜기/끄기. 10/13 녹화 방해로 껐다가 10/16 다시 켬(false 면 아무것도 그리지 않음) */
+const SPLASH_ENABLED = true;
 /** 시연 녹화용 스위치. true 면 자동으로 사라지지 않고 화면을 한 번 누를 때까지 떠 있다가 페이드아웃된다. 녹화가 끝나면 false 로 되돌린다 */
-const HOLD_UNTIL_TAP = true;
+const HOLD_UNTIL_TAP = false;
 
 export default function Splash() {
   const [phase, setPhase] = useState<"hidden" | "show" | "fade">("hidden");

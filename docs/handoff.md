@@ -25,7 +25,7 @@
 | # | 할 일 | 상태 (10/16) |
 |---|---|---|
 | 1 | 홈 카드 클릭 영역 다시 넓히기 (`app/Home.tsx` `NARROW_TAP=false`) | 완료 |
-| 2 | 스플래시 — 앱에서는 끔, 영상에 따로 붙임 (`components/Splash.tsx`) | 결정대로 꺼 둠 |
+| 2 | 스플래시 — 다시 켬, 1.6초 자동 사라짐 (`components/Splash.tsx` `SPLASH_ENABLED=true`) | 완료 10/16 (되돌림) |
 | 3 | 공무원 로그인 비밀번호 자동 입력 (`app/admin/LoginForm.tsx`) | 완료 |
 | 4 | 카드 "삭제" 버튼 비활성 (`app/admin/AdminBoard.tsx` `DELETE_ENABLED=false`) | 완료 |
 | 5 | 하단 탭 "시청" 진입점 (`components/AppShell.tsx` `SHOW_ADMIN_TAB`) | 완료 |
@@ -40,4 +40,4 @@
 - `LoginForm.tsx` `DEMO_PASSWORD` → `""`, Vercel 에 `ADMIN_PASSWORD` 설정
 - `AdminBoard.tsx` `DELETE_ENABLED` → 필요에 따라
 - `AppShell.tsx` `SHOW_ADMIN_TAB` → `false`
-- `Splash.tsx` `SPLASH_ENABLED` → `true`, `HOLD_UNTIL_TAP` → `false`
+- `Splash.tsx` 는 이미 켜져 있음(`SPLASH_ENABLED=true`, `HOLD_UNTIL_TAP=false`) — 그대로 두면 됨
